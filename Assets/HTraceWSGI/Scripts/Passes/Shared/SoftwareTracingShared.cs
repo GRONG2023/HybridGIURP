@@ -8,11 +8,56 @@ using HTraceWSGI.Scripts.Globals;
 using HTraceWSGI.Scripts.Wrappers;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace HTraceWSGI.Scripts.Passes.Shared
 {
 	internal static class SoftwareTracingShared
 	{
+		#region ---------------------------------- DirectionalLightData ----------------------------------
+		
+		// DirectionalLightData struct matching HLSL layout (48 floats = 192 bytes)
+		[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+		private struct DirectionalLightData
+		{
+			public Vector3 positionRWS;
+			public uint lightLayers;
+			public float lightDimmer;
+			public float volumetricLightDimmer;
+			public Vector3 forward;
+			public int cookieMode;
+			public Vector4 cookieScaleOffset;
+			public Vector3 right;
+			public int shadowIndex;
+			public Vector3 up;
+			public int contactShadowIndex;
+			public Vector3 color;
+			public int contactShadowMask;
+			public Vector3 shadowTint;
+			public float shadowDimmer;
+			public float volumetricShadowDimmer;
+			public int nonLightMappedOnly;
+			public float minRoughness;
+			public int screenSpaceShadowIndex;
+			public Vector4 shadowMaskSelector;
+			public float diffuseDimmer;
+			public float specularDimmer;
+			public float penumbraTint;
+			public float isRayTracedContactShadow;
+			public float distanceFromCamera;
+			public float angularDiameter;
+			public float flareFalloff;
+			public float flareCosInner;
+			public float flareCosOuter;
+			public float __unused__;
+			public Vector3 flareTint;
+			public float flareSize;
+			public Vector3 surfaceTint;
+			public Vector4 surfaceTextureScaleOffset;
+		}
+		
+		#endregion
+		
 		#region ---------------------------------- KERNELS ----------------------------------
 		
 		private enum HRenderAOKernel
@@ -152,6 +197,9 @@ namespace HTraceWSGI.Scripts.Passes.Shared
 		// Spatial offsets buffers
 		internal static ComputeBuffer PointDistributionBuffer;
 		internal static ComputeBuffer SpatialOffsetsBuffer;
+		
+		// Directional lights buffer
+		internal static ComputeBuffer DirectionalLightDatasBuffer;
         
 		// Hash buffers
 		internal static ComputeBuffer HashBuffer_Key;
@@ -315,12 +363,15 @@ namespace HTraceWSGI.Scripts.Passes.Shared
         static int HFrameCount = 0;
         static Cubemap skyCubemap = null;
 
-        internal static void Execute(CommandBuffer cmd, Camera camera, int cameraWidth, int cameraHeight, Texture cameraColorBuffer = null, Texture previousColorBuffer = null, Texture diffuseBuffer = null)
+        internal static void Execute(CommandBuffer cmd, Camera camera, int cameraWidth, int cameraHeight, Texture cameraColorBuffer = null, Texture previousColorBuffer = null, Texture diffuseBuffer = null, RenderingData renderingData = default)
 		{
 
             HFrameCount++;
             cmd.SetGlobalInt(HShaderParams.g_TestCheckbox, HSettings.DebugSettings.TestCheckbox ? 1 : 0);
             cmd.SetGlobalInt(HShaderParams.HFrameCount, HFrameCount);
+            
+            // Setup directional lights data
+            SetupDirectionalLights(cmd, renderingData);
             
             _hFrameIndex = _hFrameIndex > 15 ? 0 : _hFrameIndex;
             _hashUpdateFrameIndex = _hashUpdateFrameIndex > HConstants.HASH_UPDATE_FRACTION ? 0 : _hashUpdateFrameIndex;
@@ -566,7 +617,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                     cmd.DispatchCompute(HTracingScreenSpace, (int)HTracingScreenSpaceKernel.LightEvaluation, IndirectArgumentsSS, 0);
                 }
             }
-            return;
+    
             // ---------------------------------------- RAY COMPACTION ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_RayCompactionProfilingSampler))
             {
@@ -593,7 +644,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.DispatchCompute(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, 1, 1, HRenderer.TextureXrSlices);
             }
             
-
+     
             // TDR timeout protection
             if (SkipFirstFrame 
                 || History.TracingMode != HSettings.GeneralSettings.TracingMode
@@ -653,7 +704,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                     }
                 }
             } 
-            
+
             // ---------------------------------------- RADIANCE CACHING ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_RadianceCachingProfilingSampler))
             {
@@ -717,7 +768,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 
             }
 
-            
+ 
             // ---------------------------------------- SPATIAL PREPASS ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_SpatialPrepassProfilingSampler))
             {   
@@ -739,7 +790,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeTextureParam(HSpatialPrepass, (int)HSpatialPrepassKernel.SpatialPrepass, HShaderParams._SpatialWeights_Output,    SpatialWeightsPacked.rt);
                 cmd.SetComputeBufferParam(HSpatialPrepass, (int)HSpatialPrepassKernel.SpatialPrepass, HShaderParams._PointDistribution,    PointDistributionBuffer);
                 cmd.SetComputeBufferParam(HSpatialPrepass, (int)HSpatialPrepassKernel.SpatialPrepass, HShaderParams._SpatialOffsetsBuffer, SpatialOffsetsBuffer);
-                cmd.DispatchCompute(HSpatialPrepass, (int)HSpatialPrepassKernel.SpatialPrepass, probeResX_8, probeResY_8, HRenderer.TextureXrSlices);
+                cmd.DispatchCompute(HSpatialPrepass, (int)HSpatialPrepassKernel.SpatialPrepass, probeResX_8, probeResY_8, 1);
        
                 // Spatially filter probe ambient occlusion
                 cmd.SetComputeTextureParam(HProbeAmbientOcclusion, (int)HProbeAmbientOcclusionKernel.ProbeAmbientOcclusionSpatialFilter, HShaderParams._SpatialWeightsPacked,                 SpatialWeightsPacked.rt);
@@ -748,7 +799,8 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeTextureParam(HProbeAmbientOcclusion, (int)HProbeAmbientOcclusionKernel.ProbeAmbientOcclusionSpatialFilter, HShaderParams._ProbeAmbientOcclusion_OutputFiltered, ProbeAmbientOcclusion_Filtered.rt);
                 cmd.DispatchCompute(HProbeAmbientOcclusion, (int)HProbeAmbientOcclusionKernel.ProbeAmbientOcclusionSpatialFilter, probeResX_8, probeResY_8, HRenderer.TextureXrSlices);
             }
-            
+      
+   
 
             // ---------------------------------------- ReSTIR TEMPORAL REUSE ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_ReSTIRTemporalReuseProfilingSampler))
@@ -766,10 +818,10 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasTemporalReuse, HShaderParams._ReservoirAtlasRayData_Output, ReservoirAtlasRayData_A.rt);
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasTemporalReuse, HShaderParams._ReservoirAtlasRadianceData_Output, ReservoirAtlasRadianceData_A.rt);
                 cmd.SetComputeIntParam(HReSTIR, HShaderParams._UseDiffuseWeight, HSettings.GeneralSettings.DebugModeWS == DebugModeWS.None ? 1 : 0);
-                cmd.DispatchCompute(HReSTIR, (int)HReSTIRKernel.ProbeAtlasTemporalReuse, probeAtlasResX_8, probeAtlasResY_8, HRenderer.TextureXrSlices);
+                cmd.DispatchCompute(HReSTIR, (int)HReSTIRKernel.ProbeAtlasTemporalReuse, probeAtlasResX_8, probeAtlasResY_8, 1);
             }
             
-         
+          
             // ---------------------------------------- RESERVOIR OCCLUSION VALIDATION ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_ReservoirOcclusionValidationProfilingSampler))
             {
@@ -784,12 +836,8 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeBufferParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasSpatialReuseDisocclusion, HShaderParams._RayCounter,    RayCounter);
                 cmd.SetComputeIntParam(HReSTIR, HShaderParams._IndexXR, 0);
                 cmd.DispatchCompute(HReSTIR, (int)HReSTIRKernel.ProbeAtlasSpatialReuseDisocclusion, IndirectArgumentsSF, 0);
-                if (HRenderer.TextureXrSlices > 1)
-                {
-                    cmd.SetComputeIntParam(HReSTIR, HShaderParams._IndexXR, 1);
-                    cmd.DispatchCompute(HReSTIR, (int)HReSTIRKernel.ProbeAtlasSpatialReuseDisocclusion, IndirectArgumentsSF, sizeof(uint) * 3);
-                }
            
+            
                 // Reproject occlusion checkerboarded history
                 cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionReprojection, HShaderParams._ReprojectionCoords,         ReprojectionCoord.rt);
                 cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionReprojection, HShaderParams._ProbeAmbientOcclusion,      ProbeAmbientOcclusion_Filtered.rt);
@@ -811,33 +859,29 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeBufferParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionValidation, HShaderParams._TracingCoords, IndirectCoordsOV.ComputeBuffer);
                 cmd.SetComputeIntParam(HReservoirValidation, HShaderParams._IndexXR, 0);
                 cmd.DispatchCompute(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionValidation, IndirectArgumentsOV, 0);
-                if (HRenderer.TextureXrSlices > 1)
-                {
-                    cmd.SetComputeIntParam(HReservoirValidation, HShaderParams._IndexXR, 1);
-                    cmd.DispatchCompute(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionValidation, IndirectArgumentsOV, sizeof(uint) * 3);
-                }
            
-                // Temporal accumulation pass
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._ReprojectionWeights,        ReprojectionWeights.rt);
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._ReprojectionCoords,         ReprojectionCoord.rt);
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._ShadowGuidanceMask,         ShadowGuidanceMask.rt);
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._SampleCount_History,        ShadowGuidanceMask_SamplecountHistory.rt);
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._SampleCount_Output,         ShadowGuidanceMask_Samplecount.rt);
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._ShadowGuidanceMask_History, ShadowGuidanceMask_History.rt);
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._ShadowGuidanceMask_Output,  ShadowGuidanceMask_Accumulated.rt);
-                cmd.DispatchCompute(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, probeAtlasResX_8, probeAtlasResY_8, HRenderer.TextureXrSlices);
+                // // Temporal accumulation pass
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._ReprojectionWeights,        ReprojectionWeights.rt);
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._ReprojectionCoords,         ReprojectionCoord.rt);
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._ShadowGuidanceMask,         ShadowGuidanceMask.rt);
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._SampleCount_History,        ShadowGuidanceMask_SamplecountHistory.rt);
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._SampleCount_Output,         ShadowGuidanceMask_Samplecount.rt);
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._ShadowGuidanceMask_History, ShadowGuidanceMask_History.rt);
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, HShaderParams._ShadowGuidanceMask_Output,  ShadowGuidanceMask_Accumulated.rt);
+                // cmd.DispatchCompute(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionTemporalFilter, probeAtlasResX_8, probeAtlasResY_8, HRenderer.TextureXrSlices);
            
-                // Spatial filtering pass
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._SpatialWeightsPacked,             SpatialWeightsPacked.rt);
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._SpatialOffsetsPacked,             SpatialOffsetsPacked.rt);
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._SampleCount,                      ShadowGuidanceMask_Samplecount.rt);
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._ShadowGuidanceMask,               ShadowGuidanceMask_Accumulated.rt);
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._ShadowGuidanceMask_Output,        ShadowGuidanceMask_Filtered.rt);
-                cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._ReservoirAtlasRadianceData_Inout, ReservoirAtlasRadianceData_A.rt);
-                cmd.DispatchCompute(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, probeAtlasResX_8, probeAtlasResY_8, HRenderer.TextureXrSlices);
+                // // Spatial filtering pass
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._SpatialWeightsPacked,             SpatialWeightsPacked.rt);
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._SpatialOffsetsPacked,             SpatialOffsetsPacked.rt);
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._SampleCount,                      ShadowGuidanceMask_Samplecount.rt);
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._ShadowGuidanceMask,               ShadowGuidanceMask_Accumulated.rt);
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._ShadowGuidanceMask_Output,        ShadowGuidanceMask_Filtered.rt);
+                // cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._ReservoirAtlasRadianceData_Inout, ReservoirAtlasRadianceData_A.rt);
+                // cmd.DispatchCompute(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, probeAtlasResX_8, probeAtlasResY_8, HRenderer.TextureXrSlices);
             }
             
-            
+                       return;                  
+  
             // ---------------------------------------- ReSTIR SPATIAL REUSE ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_ReSTIRSpatialReuseProfilingSampler))
             {
@@ -1021,6 +1065,141 @@ namespace HTraceWSGI.Scripts.Passes.Shared
 			
             if (HSettings.GeneralSettings.DebugModeWS != DebugModeWS.None)
                 cmd.SetGlobalTexture(HShaderParams.g_HTraceBufferGI, DebugOutput.rt);
-		} 
+		}
+		
+		private static void SetupDirectionalLights(CommandBuffer cmd, RenderingData renderingData)
+		{
+			// Get directional lights from URP
+			var lights = renderingData.lightData.visibleLights;
+			int mainLightIndex = renderingData.lightData.mainLightIndex;
+			
+			// Count directional lights
+			int directionalLightCount = 0;
+			for (int i = 0; i < lights.Length; i++)
+			{
+				if (lights[i].lightType == LightType.Directional)
+					directionalLightCount++;
+			}
+			
+			// Allocate buffer if needed or size changed
+			if (DirectionalLightDatasBuffer == null || DirectionalLightDatasBuffer.count != Mathf.Max(1, directionalLightCount))
+			{
+				DirectionalLightDatasBuffer?.Release();
+				DirectionalLightDatasBuffer = new ComputeBuffer(Mathf.Max(1, directionalLightCount), System.Runtime.InteropServices.Marshal.SizeOf<DirectionalLightData>());
+			}
+			
+			if (directionalLightCount == 0)
+			{
+				// No directional lights, set default data
+				var defaultData = new DirectionalLightData[1];
+				defaultData[0] = GetDefaultDirectionalLightData();
+				DirectionalLightDatasBuffer.SetData(defaultData);
+				cmd.SetGlobalInt(HShaderParams._DirectionalLightCount, 0);
+			}
+			else
+			{
+				// Fill directional lights data
+				var lightDatas = new DirectionalLightData[directionalLightCount];
+				int index = 0;
+				
+				for (int i = 0; i < lights.Length; i++)
+				{
+					if (lights[i].lightType == LightType.Directional)
+					{
+						var light = lights[i];
+						var lightData = new DirectionalLightData();
+						
+						// Core data from URP
+						lightData.color = new Vector3(light.finalColor.r, light.finalColor.g, light.finalColor.b);
+						lightData.forward = -light.localToWorldMatrix.GetColumn(2); // Forward direction
+						lightData.right = light.localToWorldMatrix.GetColumn(0);
+						lightData.up = light.localToWorldMatrix.GetColumn(1);
+						
+						// Position (for directional light, this is usually direction-based)
+						lightData.positionRWS = -lightData.forward * 1000.0f; // Far away position
+						
+						// Default values for fields not available in URP
+						lightData.lightLayers = 0xFFFFFFFF; // All layers
+						lightData.lightDimmer = 1.0f;
+						lightData.volumetricLightDimmer = 1.0f;
+						lightData.cookieMode = 0;
+						lightData.cookieScaleOffset = Vector4.zero;
+						lightData.shadowIndex = -1;
+						lightData.contactShadowIndex = -1;
+						lightData.contactShadowMask = 0;
+						lightData.shadowTint = Vector3.one;
+						lightData.shadowDimmer = 1.0f;
+						lightData.volumetricShadowDimmer = 1.0f;
+						lightData.nonLightMappedOnly = 0;
+						lightData.minRoughness = 0.0f;
+						lightData.screenSpaceShadowIndex = -1;
+						lightData.shadowMaskSelector = Vector4.zero;
+						lightData.diffuseDimmer = 1.0f;
+						lightData.specularDimmer = 1.0f;
+						lightData.penumbraTint = 0.0f;
+						lightData.isRayTracedContactShadow = 0.0f;
+						lightData.distanceFromCamera = 0.0f;
+						lightData.angularDiameter = 0.53f; // Default sun angular diameter
+						lightData.flareFalloff = 0.0f;
+						lightData.flareCosInner = 0.0f;
+						lightData.flareCosOuter = 0.0f;
+						lightData.__unused__ = 0.0f;
+						lightData.flareTint = Vector3.zero;
+						lightData.flareSize = 0.0f;
+						lightData.surfaceTint = Vector3.one;
+						lightData.surfaceTextureScaleOffset = Vector4.zero;
+						
+						lightDatas[index] = lightData;
+						index++;
+					}
+				}
+				
+				DirectionalLightDatasBuffer.SetData(lightDatas);
+				cmd.SetGlobalInt(HShaderParams._DirectionalLightCount, directionalLightCount);
+			}
+
+			cmd.SetGlobalBuffer(HShaderParams._DirectionalLightDatas, DirectionalLightDatasBuffer);
+		}
+		
+		private static DirectionalLightData GetDefaultDirectionalLightData()
+		{
+			return new DirectionalLightData
+			{
+				positionRWS = new Vector3(0, 1000, 0),
+				lightLayers = 0xFFFFFFFF,
+				lightDimmer = 1.0f,
+				volumetricLightDimmer = 1.0f,
+				forward = new Vector3(0, -1, 0),
+				cookieMode = 0,
+				cookieScaleOffset = Vector4.zero,
+				right = new Vector3(1, 0, 0),
+				shadowIndex = -1,
+				up = new Vector3(0, 0, 1),
+				contactShadowIndex = -1,
+				color = Vector3.one,
+				contactShadowMask = 0,
+				shadowTint = Vector3.one,
+				shadowDimmer = 1.0f,
+				volumetricShadowDimmer = 1.0f,
+				nonLightMappedOnly = 0,
+				minRoughness = 0.0f,
+				screenSpaceShadowIndex = -1,
+				shadowMaskSelector = Vector4.zero,
+				diffuseDimmer = 1.0f,
+				specularDimmer = 1.0f,
+				penumbraTint = 0.0f,
+				isRayTracedContactShadow = 0.0f,
+				distanceFromCamera = 0.0f,
+				angularDiameter = 0.53f,
+				flareFalloff = 0.0f,
+				flareCosInner = 0.0f,
+				flareCosOuter = 0.0f,
+				__unused__ = 0.0f,
+				flareTint = Vector3.zero,
+				flareSize = 0.0f,
+				surfaceTint = Vector3.one,
+				surfaceTextureScaleOffset = Vector4.zero
+			};
+		}
 	}
 }

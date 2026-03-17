@@ -49,6 +49,10 @@ namespace HTraceWSGI.Scripts.Globals
         public static readonly int unity_SpecCube2 = Shader.PropertyToID("unity_SpecCube2");
         public static readonly int unity_SpecCube0 = Shader.PropertyToID("unity_SpecCube0");
 
+		public static readonly int _DirectionalLightCount = Shader.PropertyToID("_DirectionalLightCount");
+		public static readonly int _DirectionalLightDatas = Shader.PropertyToID("_DirectionalLightDatas");
+		
+
 
         // ---------------------------------------------- GBuffer ----------------------------------------------
         public static readonly int _GBuffer0                     = Shader.PropertyToID("_GBuffer0");
