@@ -1,0 +1,530 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38eab8cd1db62134f9bb3f9fbd7aad5f, type: 3}
+  m_Name: SceneSectionConfig
+  m_EditorClassIdentifier: 
+  m_Id: 0
+  m_BoundsConfigCollection:
+    configurations:
+    - targetObjectPath: /StaticRoot/BigMeshGroup_7_-9_10/SM_H_Building_Tide_PrisonMain_02_LOD0
+      originalBoundsSize: {x: 96.0674, y: 27.958673, z: 54.753994}
+      originalBoundsCenter: {x: 504.6119, y: -9.607021, z: 556.27277}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/BigMeshGroup_7_-7_31/SM_H_Building_Tide_PrisonMain_11_LOD0
+      originalBoundsSize: {x: 75.65846, y: 36.172363, z: 44.318005}
+      originalBoundsCenter: {x: 505.55258, y: -87.634445, z: 416.39337}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/MidMeshGroup_8_-9_29/SM_H_Building_Tide_Jail_D_01_ExterWall
+      originalBoundsSize: {x: 116.89964, y: 26.634285, z: 135.4553}
+      originalBoundsCenter: {x: 575.14166, y: -83.8073, z: 565.1634}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/BigMeshGroup_8_-10_1/SM_H_Building_Tide_PrisonMain_04u_LOD0
+      originalBoundsSize: {x: 34.7926, y: 34.70127, z: 73.7569}
+      originalBoundsCenter: {x: 551.00586, y: -19.976757, z: 619.3951}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/BigMeshGroup_6_-10_2/SM_H_Building_Tide_PrisonMain_04u_LOD0
+      originalBoundsSize: {x: 27.321619, y: 34.70127, z: 80.11268}
+      originalBoundsCenter: {x: 445.05527, y: -20.651657, z: 623.38495}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_1_SM_H_Building_Tide_PrisonMain_14_1_43265/SM_H_Building_Tide_PrisonMain_14_LOD0
+      originalBoundsSize: {x: 93.494194, y: 47.469204, z: 25.676441}
+      originalBoundsCenter: {x: 585.11383, y: -91.73452, z: 263.11703}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_1_SM_H_Building_Tide_PrisonMain_Tower_01_1_21234/SM_H_Building_Tide_PrisonMain_Tower_01_LOD0
+      originalBoundsSize: {x: 15.647876, y: 46.79561, z: 15.714615}
+      originalBoundsCenter: {x: 353.1877, y: -37.699554, z: 364.4536}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_Tower_01_1_45841/SM_H_Building_Tide_PrisonMain_Tower_01_LOD0
+      originalBoundsSize: {x: 19.31064, y: 46.819286, z: 19.312157}
+      originalBoundsCenter: {x: 693.4202, y: -52.54258, z: 108.45565}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_12c_2_1144/SM_H_Building_Tide_PrisonMain_12c_LOD1
+      originalBoundsSize: {x: 29.046932, y: 8.820885, z: 30.579811}
+      originalBoundsCenter: {x: 427.83395, y: -5.9239326, z: 471.78763}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_11b_1_43416/SM_H_Building_Tide_PrisonMain_11b_LOD1
+      originalBoundsSize: {x: 65.41887, y: 32.455887, z: 29.725458}
+      originalBoundsCenter: {x: 573.2061, y: -89.596985, z: 423.71048}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_14a_1_21078/SM_H_Building_Tide_PrisonMain_14a_LOD1
+      originalBoundsSize: {x: 91.16043, y: 47.486042, z: 23.35701}
+      originalBoundsCenter: {x: 501.4977, y: -91.72607, z: 264.27365}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_14f_2_21079/SM_H_Building_Tide_PrisonMain_14f_LOD0
+      originalBoundsSize: {x: 12.3411255, y: 19.178822, z: 39.581768}
+      originalBoundsCenter: {x: 481.60458, y: -90.66341, z: 287.8572}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_1_SM_H_Building_Tide_PrisonMain_03_2_603/SM_H_Building_Tide_PrisonMain_03_LOD0
+      originalBoundsSize: {x: 46.903706, y: 35.853733, z: 49.437084}
+      originalBoundsCenter: {x: 370.23267, y: -34.418983, z: 565.29614}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_09_7_1149/SM_H_Building_Tide_PrisonMain_09_LOD0
+      originalBoundsSize: {x: 37.16882, y: 20.530514, z: 53.52546}
+      originalBoundsCenter: {x: 399.52625, y: -13.50983, z: 510.75394}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_Tower_01_1_600/SM_H_Building_Tide_PrisonMain_Tower_01_LOD0
+      originalBoundsSize: {x: 21.377277, y: 43.838272, z: 21.376474}
+      originalBoundsCenter: {x: 382.49033, y: -2.7980947, z: 536.79315}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_07_1_16941/SM_H_Building_Tide_PrisonMain_07_LOD1
+      originalBoundsSize: {x: 50.520157, y: 12.540213, z: 13.159134}
+      originalBoundsCenter: {x: 452.10013, y: -17.451418, z: 495.28986}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_01b_1_20991/SM_H_Building_Tide_PrisonMain_01b_LOD1
+      originalBoundsSize: {x: 68.56294, y: 19.70341, z: 44.747734}
+      originalBoundsCenter: {x: 507.8861, y: 5.743784, z: 511.77225}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_01d_2_20992/SM_H_Building_Tide_PrisonMain_01d_LOD0
+      originalBoundsSize: {x: 73.40434, y: 23.608868, z: 70.8174}
+      originalBoundsCenter: {x: 507.20108, y: 6.93454, z: 455.32776}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_04_3_36284/SM_H_Building_Tide_PrisonMain_04_LOD0
+      originalBoundsSize: {x: 9.215347, y: 21.493917, z: 48.95439}
+      originalBoundsCenter: {x: 607.8577, y: -13.384216, z: 512.92596}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_Tower_01_1_41069/SM_H_Building_Tide_PrisonMain_Tower_01_LOD0
+      originalBoundsSize: {x: 15.650047, y: 41.01677, z: 15.647853}
+      originalBoundsCenter: {x: 608.9317, y: -3.043459, z: 486.5973}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_12c_6_41074/SM_H_Building_Tide_PrisonMain_12c_LOD0
+      originalBoundsSize: {x: 29.047792, y: 8.814256, z: 30.577293}
+      originalBoundsCenter: {x: 593.43384, y: -5.9348774, z: 469.9825}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_12c_1_36248/SM_H_Building_Tide_PrisonMain_12c_LOD0
+      originalBoundsSize: {x: 29.047792, y: 8.814256, z: 30.577293}
+      originalBoundsCenter: {x: 551.8493, y: -5.9348774, z: 469.9825}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_12d_6_36253/SM_H_Building_Tide_PrisonMain_12d_LOD1
+      originalBoundsSize: {x: 23.98261, y: 7.215318, z: 8.51034}
+      originalBoundsCenter: {x: 572.8653, y: -5.837721, z: 467.33514}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_12_2_24492/SM_H_Building_Tide_PrisonMain_12_LOD0
+      originalBoundsSize: {x: 16.463854, y: 48.811943, z: 25.54718}
+      originalBoundsCenter: {x: 550.84534, y: -33.244183, z: 473.04724}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/BigMeshGroup_7_-8_27/SM_H_Building_Tide_PrisonMain_01_LOD0
+      originalBoundsSize: {x: 77.50949, y: 73.2101, z: 60.998676}
+      originalBoundsCenter: {x: 506.82428, y: -38.67137, z: 458.94955}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_12e_1_24491/SM_H_Building_Tide_PrisonMain_12e_LOD1
+      originalBoundsSize: {x: 33.361572, y: 50.81372, z: 15.433706}
+      originalBoundsCenter: {x: 572.671, y: -34.467316, z: 474.9276}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_12_2_34512/SM_H_Building_Tide_PrisonMain_12_LOD0
+      originalBoundsSize: {x: 16.463854, y: 48.811943, z: 25.54718}
+      originalBoundsCenter: {x: 593.587, y: -33.244183, z: 473.05273}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_04s_6_36287/SM_H_Building_Tide_PrisonMain_04s_LOD1
+      originalBoundsSize: {x: 37.688713, y: 7.8993163, z: 34.846085}
+      originalBoundsCenter: {x: 627.2946, y: -21.082817, z: 516.39276}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_WaterControl_01_1_12879/SM_H_Building_Tide_WaterControl_01_LOD1
+      originalBoundsSize: {x: 69.73541, y: 33.656357, z: 39.103085}
+      originalBoundsCenter: {x: 518.2052, y: -87.2318, z: 663.83093}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_2_SM_H_Building_Tide_Waterway_12_4_10929/SM_H_Building_Tide_Waterway_12_LOD1
+      originalBoundsSize: {x: 63.378643, y: 32.91115, z: 32.585064}
+      originalBoundsCenter: {x: 452.4073, y: -90.75255, z: 655.974}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_DeepJail_04_1_15046/SM_H_Building_Tide_DeepJail_04_LOD1
+      originalBoundsSize: {x: 112.4728, y: 65.505486, z: 48.254745}
+      originalBoundsCenter: {x: 506.96225, y: -130.42828, z: 484.0093}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_Canteen_06E_18_1039/SM_H_Building_Tide_Canteen_06E
+      originalBoundsSize: {x: 52.459885, y: 13.13545, z: 54.029274}
+      originalBoundsCenter: {x: 473.83112, y: -81.83236, z: 574.29895}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_Tower_01_1_8418/SM_H_Building_Tide_PrisonMain_Tower_01_LOD0
+      originalBoundsSize: {x: 20.06981, y: 51.830967, z: 20.068502}
+      originalBoundsCenter: {x: 454.8337, y: 2.77149, z: 660.0877}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_Tower_01_1_1143/SM_H_Building_Tide_PrisonMain_Tower_01_LOD0
+      originalBoundsSize: {x: 21.418924, y: 45.51598, z: 21.418144}
+      originalBoundsCenter: {x: 410.67908, y: -2.277295, z: 487.17108}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_Tower_01_1_30663/SM_H_Building_Tide_PrisonMain_Tower_01_LOD0
+      originalBoundsSize: {x: 22.129326, y: 54.98987, z: 22.129364}
+      originalBoundsCenter: {x: 538.25684, y: 2.3778868, z: 653.4474}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_3_SM_H_Building_Tide_PrisonMain_Tower_01_1_45434/SM_H_Building_Tide_PrisonMain_Tower_01_LOD0
+      originalBoundsSize: {x: 15.650047, y: 47.99171, z: 15.647853}
+      originalBoundsCenter: {x: 658.3548, y: -38.322292, z: 345.5183}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_08_171_8063/SM_H_Building_Tide_PrisonMain_08_LOD1
+      originalBoundsSize: {x: 51.90646, y: 14.578436, z: 55.042595}
+      originalBoundsCenter: {x: 438.97003, y: -16.8182, z: 557.606}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_1_SM_H_Building_Tide_PrisonMain_09b_1_7409/SM_H_Building_Tide_PrisonMain_09b_LOD1
+      originalBoundsSize: {x: 56.093857, y: 27.935982, z: 55.29697}
+      originalBoundsCenter: {x: 410.94632, y: -17.216553, z: 561.5611}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_Dock_10_1_7817/SM_H_Building_Tide_Dock_10_LOD1
+      originalBoundsSize: {x: 22.76049, y: 18.3969, z: 75.92568}
+      originalBoundsCenter: {x: 388.94345, y: -83.76451, z: 457.3012}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_Dock_06_12_7828/SM_H_Building_Tide_Dock_06_LOD1
+      originalBoundsSize: {x: 66.909065, y: 42.62203, z: 116.02061}
+      originalBoundsCenter: {x: 410.9505, y: -84.11438, z: 457.86212}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_19_SM_H_Building_Tide_WaterMaintain_01_17_3170/SM_H_Building_Tide_WaterMaintain_01_LOD0
+      originalBoundsSize: {x: 98.69721, y: 24.758026, z: 98.69722}
+      originalBoundsCenter: {x: 405.8157, y: -90.50518, z: 626.5908}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_23_SM_H_Building_Tide_Waterway_06_5_3195/SM_H_Building_Tide_Waterway_06_LOD1
+      originalBoundsSize: {x: 9.75299, y: 5.7291565, z: 23.077133}
+      originalBoundsCenter: {x: 418.67252, y: -90.223755, z: 588.1215}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -0.27, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_23_SM_H_Building_Tide_Waterway_06a_2_3192/SM_H_Building_Tide_Waterway_06a_LOD0
+      originalBoundsSize: {x: 8.241175, y: 4.4792714, z: 7.887894}
+      originalBoundsCenter: {x: 409.83557, y: -90.267166, z: 587.1808}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -0.14, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_11_SM_H_Building_Tide_Loungehall_15_1_3833/SM_H_Building_Tide_Loungehall_15_LOD0
+      originalBoundsSize: {x: 16.073439, y: 5.4539347, z: 6.5871115}
+      originalBoundsCenter: {x: 441.95947, y: -90.53979, z: 528.3245}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -0.27, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_5_SM_H_Building_Tide_Loungehall_29_1_1090/SM_H_Building_Tide_Loungehall_29_LOD0
+      originalBoundsSize: {x: 26.457043, y: 7.1769333, z: 24.18454}
+      originalBoundsCenter: {x: 462.43317, y: -89.80251, z: 524.9694}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_Corridor_07_5_3606/SM_H_Building_Tide_Corridor_07_LOD0
+      originalBoundsSize: {x: 9.43215, y: 6.049365, z: 11.410007}
+      originalBoundsCenter: {x: 442.3699, y: -84.72104, z: 518.8738}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -0.01, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_13_SM_H_Building_Tide_Waterway_04_13_3853/SM_H_Building_Tide_Waterway_04_LOD1
+      originalBoundsSize: {x: 43.090843, y: 21.706688, z: 28.863045}
+      originalBoundsCenter: {x: 402.7855, y: -91.68584, z: 562.6166}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_DeepJail_13_3_14998
+      originalBoundsSize: {x: 69.087585, y: 55.018463, z: 61.648804}
+      originalBoundsCenter: {x: 507.9962, y: -126.44125, z: 543.3716}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_Building_Industrial_MixingRoom_02_48_17877
+      originalBoundsSize: {x: 8.696515, y: 4.389683, z: 6.3946137}
+      originalBoundsCenter: {x: 480.72256, y: 17.315819, z: 597.1429}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_Examinationroom_01C_1_40864/SM_H_Building_Tide_Examinationroom_01C
+      originalBoundsSize: {x: 42.950283, y: 6.662461, z: 76.370056}
+      originalBoundsCenter: {x: 614.77484, y: -91.38624, z: 468.45898}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_04d_1_34511/SM_H_Building_Tide_PrisonMain_04d_LOD0
+      originalBoundsSize: {x: 40.555565, y: 17.722916, z: 44.98294}
+      originalBoundsCenter: {x: 626.8431, y: -32.37951, z: 511.77567}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_2_SM_NavalBattle_Nature_Rock_Large_Cliff_06_27_1264/SM_NavalBattle_Nature_Rock_Large_Cliff_06_LOD0
+      originalBoundsSize: {x: 26.314728, y: 32.00423, z: 39.78181}
+      originalBoundsCenter: {x: 375.3181, y: -40.936226, z: 488.6765}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_Tower_01_4_36285/SM_H_Building_Tide_PrisonMain_Tower_01_LOD0
+      originalBoundsSize: {x: 15.650047, y: 41.01677, z: 15.647853}
+      originalBoundsCenter: {x: 609.091, y: -3.4127626, z: 536.6586}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_0_SM_H_Building_Tide_PrisonMain_04m_9_36256/SM_H_Building_Tide_PrisonMain_04m_LOD0
+      originalBoundsSize: {x: 7.6162653, y: 22.452602, z: 43.915867}
+      originalBoundsCenter: {x: 539.23285, y: -12.9025, z: 509.87744}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -1, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_2_SM_H_Gibraltar_Props_Industrial_ElectricBox_02b_136_33320/SM_H_Gibraltar_Props_Industrial_ElectricBox_02b_LOD0
+      originalBoundsSize: {x: 4.3521504, y: 4.5136824, z: 9.639576}
+      originalBoundsCenter: {x: 535.02625, y: 17.24366, z: 457.26392}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -0.16, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    - targetObjectPath: /StaticRoot/Actor_1_SM_H_Gibraltar_Props_Industrial_ElectricBox_02b_96_17056/SM_H_Gibraltar_Props_Industrial_ElectricBox_02b_LOD0
+      originalBoundsSize: {x: 7.6492863, y: 3.5817368, z: 3.4535599}
+      originalBoundsCenter: {x: 480.58804, y: 17.169477, z: 510.53442}
+      outerScale: {x: 1, y: 1, z: 1}
+      outerOffset: {x: 0, y: 0, z: 0}
+      innerScale: {x: 0.9, y: 1, z: 0.9}
+      innerOffset: {x: 0, y: -0.18, z: 0}
+      outerColor: {r: 0, g: 0, b: 0, a: 0}
+      innerColor: {r: 0, g: 0, b: 0, a: 0}
+    exportDate: 2025/9/25 16:52:04
+    sceneName: TidePrisonMod
+    globalOuterScale: {x: 1, y: 1, z: 1}
+    globalOuterOffset: {x: 0, y: 0, z: 0}
+    globalInnerScale: {x: 0.9, y: 1, z: 0.9}
+    globalInnerOffset: {x: 0, y: -1, z: 0}
+    globalOuterColor: {r: 1, g: 1, b: 0, a: 1}
+    globalInnerColor: {r: 0, g: 0, b: 1, a: 1}
+    globalMinSectionSize: {x: 0, y: 0, z: 0}

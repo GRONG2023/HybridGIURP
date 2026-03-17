@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc81f4d5db0d83a4c96d29940ea0dc44, type: 3}
+  m_Name: SceneItem
+  m_EditorClassIdentifier: 
+  m_ItemConfigList: {fileID: 11400000, guid: b90e24fb2b70c9f4b9f4945c82f1b40f, type: 2}
+  m_ItemRoot: {fileID: 1190584962982265095, guid: 65279352043c0d147bbf41adb826f0b8, type: 3}
+  m_InputPath: Assets/Art/Scene/TidePrison/ItemConfig/mapArticle_cxjy.txt
+  m_CSVItemDataPath: 
+  m_MapId: 105
+  m_MapMode: 3

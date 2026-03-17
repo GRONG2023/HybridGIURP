@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49e8f3584cf474c41bf57fac3eec4bbb, type: 3}
+  m_Name: SceneInfo
+  m_EditorClassIdentifier: 
+  m_Desc: "\u6F6E\u6C50\u76D1\u72F1"
+  m_DetectorData:
+    m_FOV: 75
+    m_FCP: 120
+    m_ExtSize: {x: 60, y: 60, z: 60}
+    m_ColliderSize: {x: 50, y: 200, z: 50}
+  m_LightData:
+    m_Light: {fileID: 4623786665150465247, guid: 0907088fe64644965be9579052155f12, type: 3}
+  m_NavMeshData:
+    m_NavMesh: {fileID: 7244431162681113916, guid: 826dc31e01f33c544a8a501c1c19cffd, type: 3}
+  m_StaticRoot: {fileID: 4516861680117639666, guid: 1a5b924d369ce834e9926922941ddf35, type: 3}
+  m_ColliderRoots: []
+  m_ItemRoots:
+  - GameObject: {fileID: 1190584962982265095, guid: 65279352043c0d147bbf41adb826f0b8, type: 3}
+    Layer: 0
+  - GameObject: {fileID: 9051535378663543446, guid: 11d6ce9f9608f454880fa3fcf0b8054e, type: 3}
+    Layer: 0
+  - GameObject: {fileID: 5693810974779430771, guid: 6d44b9045c34fd348bc9397a08883083, type: 3}
+    Layer: 0
+  m_InteractorRoots:
+  - GameObject: {fileID: 945929360579177160, guid: 75314c0fa9547e141af8d4a316644cf3, type: 3}
+    Layer: 0
+  - GameObject: {fileID: 2153795101161516067, guid: 1b7090423caff474cae0e57c48f9e225, type: 3}
+    Layer: 0
+  - GameObject: {fileID: 4400929118490797665, guid: e28b35841ca0c144ead53099aef14efc, type: 3}
+    Layer: 0
+  - GameObject: {fileID: 271639290433108870, guid: 45c0501559f149e47b8d822daf22e3f6, type: 3}
+    Layer: 0
+  m_SceneSectionConfig: {fileID: 11400000, guid: dbf6e54186227224686cdd6e9171d7fc, type: 2}
+  m_SceneFloorConfig: {fileID: 11400000, guid: 8db0596a9a525b84596f0d9fedbacf36, type: 2}
+  m_ArtPath: Assets/Art/Scene/TidePrison
+  m_ExportPath: Assets/Bundle/Scene/TidePrison
+  m_ExportItemPath: Assets/Bundle/Item
+  m_GenAdditive: 0
+  m_GenMesh: 0
+  m_GenPrefab: 1
