@@ -62,6 +62,8 @@ PackedVaryings vert(Attributes input)
     return packedOutput;
 }
 
+
+
 FragmentOutput frag(PackedVaryings packedInput)
 {
     Varyings unpacked = UnpackVaryings(packedInput);
@@ -112,7 +114,8 @@ FragmentOutput frag(PackedVaryings packedInput)
 
     Light mainLight = GetMainLight(inputData.shadowCoord, inputData.positionWS, inputData.shadowMask);
     MixRealtimeAndBakedGI(mainLight, inputData.normalWS, inputData.bakedGI, inputData.shadowMask);
-    half3 color = GlobalIllumination(brdfData, inputData.bakedGI, surfaceDescription.Occlusion, inputData.positionWS, inputData.normalWS, inputData.viewDirectionWS);
-
-    return BRDFDataToGbuffer(brdfData, inputData, surfaceDescription.Smoothness, surfaceDescription.Emission + color, surfaceDescription.Occlusion);
+    // half3 color = GlobalIllumination(brdfData, inputData.bakedGI, surfaceDescription.Occlusion, inputData.positionWS, inputData.normalWS, inputData.viewDirectionWS);
+        // half3 diffuseLighting = SAMPLE_TEXTURE2D(_HTraceBufferGI, sampler_LinearClamp, inputData.normalizedScreenSpaceUV.xy);
+    return BRDFDataToGbuffer(brdfData, inputData, surfaceDescription.Smoothness, half3(0,0,0), surfaceDescription.Occlusion);
+    // return BRDFDataToGbuffer(brdfData, inputData, surfaceDescription.Smoothness, surfaceDescription.Emission + color, surfaceDescription.Occlusion);
 }

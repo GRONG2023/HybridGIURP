@@ -170,17 +170,15 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
 
             // -------------------------------------- BUFFERS -------------------------------------- //
 
-            // URP中TextureXrSlices固定为1
-            int textureXrSlices = 1;
 
-            if (SoftwareTracingShared.RayCounter == null) SoftwareTracingShared.RayCounter = new ComputeBuffer(10 * textureXrSlices, sizeof(uint));
-            if (SoftwareTracingShared.RayCounterWS == null) SoftwareTracingShared.RayCounterWS = new ComputeBuffer(10 * textureXrSlices, sizeof(uint));
-            if (SoftwareTracingShared.IndirectArgumentsSS == null) SoftwareTracingShared.IndirectArgumentsSS = new ComputeBuffer(3 * textureXrSlices, sizeof(uint), ComputeBufferType.IndirectArguments);
-            if (SoftwareTracingShared.IndirectArgumentsWS == null) SoftwareTracingShared.IndirectArgumentsWS = new ComputeBuffer(3 * textureXrSlices, sizeof(uint), ComputeBufferType.IndirectArguments);
-            if (SoftwareTracingShared.IndirectArgumentsOV == null) SoftwareTracingShared.IndirectArgumentsOV = new ComputeBuffer(3 * textureXrSlices, sizeof(uint), ComputeBufferType.IndirectArguments);
-            if (SoftwareTracingShared.IndirectArgumentsSF == null) SoftwareTracingShared.IndirectArgumentsSF = new ComputeBuffer(3 * textureXrSlices, sizeof(uint), ComputeBufferType.IndirectArguments);
+            if (SoftwareTracingShared.RayCounter == null) SoftwareTracingShared.RayCounter = new ComputeBuffer(10, sizeof(uint));
+            if (SoftwareTracingShared.RayCounterWS == null) SoftwareTracingShared.RayCounterWS = new ComputeBuffer(10, sizeof(uint));
+            if (SoftwareTracingShared.IndirectArgumentsSS == null) SoftwareTracingShared.IndirectArgumentsSS = new ComputeBuffer(3, sizeof(uint), ComputeBufferType.IndirectArguments);
+            if (SoftwareTracingShared.IndirectArgumentsWS == null) SoftwareTracingShared.IndirectArgumentsWS = new ComputeBuffer(3, sizeof(uint), ComputeBufferType.IndirectArguments);
+            if (SoftwareTracingShared.IndirectArgumentsOV == null) SoftwareTracingShared.IndirectArgumentsOV = new ComputeBuffer(3, sizeof(uint), ComputeBufferType.IndirectArguments);
+            if (SoftwareTracingShared.IndirectArgumentsSF == null) SoftwareTracingShared.IndirectArgumentsSF = new ComputeBuffer(3, sizeof(uint), ComputeBufferType.IndirectArguments);
 
-            if (SoftwareTracingShared.PointDistributionBuffer == null) SoftwareTracingShared.PointDistributionBuffer = new ComputeBuffer(textureXrSlices * 32 * 4, 2 * sizeof(float));
+            if (SoftwareTracingShared.PointDistributionBuffer == null) SoftwareTracingShared.PointDistributionBuffer = new ComputeBuffer(32 * 4, 2 * sizeof(float));
             if (SoftwareTracingShared.SpatialOffsetsBuffer == null) SoftwareTracingShared.SpatialOffsetsBuffer = new ComputeBuffer(9 * 9, 2 * sizeof(int));
 
             if (SoftwareTracingShared.HashBuffer_Key == null) SoftwareTracingShared.HashBuffer_Key = new ComputeBuffer(HConstants.HASH_STORAGE_SIZE, 1 * sizeof(uint));
@@ -201,7 +199,7 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
 
             // -------------------------------------- PROBE AO RT -------------------------------------- //
             SoftwareTracingShared.ProbeAmbientOcclusion.HTextureAlloc("_ProbeAmbientOcclusion", ProbeRes, GraphicsFormat.R16_UInt);
-            SoftwareTracingShared.ProbeAmbientOcclusion_History.HTextureAlloc("_ProbeAmbientOcclusion_History", ProbeRes, GraphicsFormat.R16_UInt, textureXrSlices * HConstants.PERSISTENT_HISTORY_SAMPLES, textureDimension: TextureDimension.Tex2DArray);
+            SoftwareTracingShared.ProbeAmbientOcclusion_History.HTextureAlloc("_ProbeAmbientOcclusion_History", ProbeRes, GraphicsFormat.R16_UInt, HConstants.PERSISTENT_HISTORY_SAMPLES, textureDimension: TextureDimension.Tex2DArray);
             SoftwareTracingShared.ProbeAmbientOcclusion_Filtered.HTextureAlloc("_ProbeAmbientOcclusion_Filtered", ProbeRes, GraphicsFormat.R8_UNorm);
 
             // -------------------------------------- GBUFFER RT -------------------------------------- //
@@ -209,29 +207,30 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
             SoftwareTracingShared.NormalDepth_History.HTextureAlloc("_NormalDepth_History", FullRes, GraphicsFormat.R32G32_UInt);
             SoftwareTracingShared.ProbeNormalDepth.HTextureAlloc("_ProbeNormalDepth", ProbeRes, GraphicsFormat.R32G32_UInt);
             SoftwareTracingShared.ProbeNormalDepth_History.HTextureAlloc("_ProbeNormalDepth_History", ProbeRes, GraphicsFormat.R32G32_UInt);
-            SoftwareTracingShared.ProbeWorldPosNormal_History.HTextureAlloc("_ProbeWorldPosNormal_History", ProbeRes, GraphicsFormat.R32G32B32A32_UInt, textureXrSlices * HConstants.PERSISTENT_HISTORY_SAMPLES, textureDimension: TextureDimension.Tex2DArray);
+            SoftwareTracingShared.ProbeWorldPosNormal_History.HTextureAlloc("_ProbeWorldPosNormal_History", ProbeRes, GraphicsFormat.R32G32B32A32_UInt, HConstants.PERSISTENT_HISTORY_SAMPLES, textureDimension: TextureDimension.Tex2DArray);
             SoftwareTracingShared.ProbeNormalDepth_Intermediate.HTextureAlloc("_ProbeNormalDepth_Intermediate", ProbeRes, GraphicsFormat.R32G32_UInt);
             SoftwareTracingShared.ProbeDiffuse.HTextureAlloc("_ProbeDiffuse", ProbeRes, GraphicsFormat.R8G8B8A8_UNorm);
 
             // -------------------------------------- REPROJECTION RT -------------------------------------- //
-            SoftwareTracingShared.HistoryIndirection.HTextureAlloc("_HistoryIndirection", ProbeRes, GraphicsFormat.R16G16_UInt, textureXrSlices * HConstants.PERSISTENT_HISTORY_SAMPLES, textureDimension: TextureDimension.Tex2DArray);
+            SoftwareTracingShared.HistoryIndirection.HTextureAlloc("_HistoryIndirection", ProbeRes, GraphicsFormat.R16G16_UInt, HConstants.PERSISTENT_HISTORY_SAMPLES, textureDimension: TextureDimension.Tex2DArray);
             SoftwareTracingShared.ReprojectionWeights.HTextureAlloc("_ReprojectionWeights", ProbeRes, GraphicsFormat.R8G8B8A8_UNorm);
             SoftwareTracingShared.PersistentReprojectionWeights.HTextureAlloc("_PersistentReprojectionWeights", ProbeRes, GraphicsFormat.R8G8B8A8_UNorm);
             SoftwareTracingShared.ReprojectionCoord.HTextureAlloc("_ReprojectionCoord", ProbeRes, GraphicsFormat.R16G16_UInt);
             SoftwareTracingShared.PersistentReprojectionCoord.HTextureAlloc("_PersistentReprojectionCoord", ProbeRes, GraphicsFormat.R16G16_UInt);
 
             // -------------------------------------- SPATIAL PREPASS RT -------------------------------------- //
-            SoftwareTracingShared.SpatialOffsetsPacked.HTextureAlloc("_SpatialOffsetsPacked", ProbeRes, GraphicsFormat.R32G32B32A32_UInt, textureXrSlices * 4, textureDimension: TextureDimension.Tex2DArray);
-            SoftwareTracingShared.SpatialWeightsPacked.HTextureAlloc("_SpatialWeightsPacked", ProbeRes, GraphicsFormat.R16G16B16A16_UInt, textureXrSlices * 4, textureDimension: TextureDimension.Tex2DArray);
+            SoftwareTracingShared.SpatialOffsetsPacked.HTextureAlloc("_SpatialOffsetsPacked", ProbeRes, GraphicsFormat.R32G32B32A32_UInt, 4, textureDimension: TextureDimension.Tex2DArray);
+            SoftwareTracingShared.SpatialWeightsPacked.HTextureAlloc("_SpatialWeightsPacked", ProbeRes, GraphicsFormat.R16G16B16A16_UInt, 4, textureDimension: TextureDimension.Tex2DArray);
 
             // -------------------------------------- RESERVOIR RT -------------------------------------- //
             SoftwareTracingShared.ReservoirAtlas.HTextureAlloc("_ReservoirAtlas", ProbeAtlasRes, GraphicsFormat.R32G32B32A32_UInt);
-            SoftwareTracingShared.ReservoirAtlas_History.HTextureAlloc("_ReservoirAtlas_History", ProbeAtlasRes, GraphicsFormat.R32G32B32A32_UInt, textureXrSlices * HConstants.PERSISTENT_HISTORY_SAMPLES, textureDimension: TextureDimension.Tex2DArray);
+            SoftwareTracingShared.ReservoirAtlas_History.HTextureAlloc("_ReservoirAtlas_History", ProbeAtlasRes, GraphicsFormat.R32G32B32A32_UInt, HConstants.PERSISTENT_HISTORY_SAMPLES, textureDimension: TextureDimension.Tex2DArray);
             SoftwareTracingShared.ReservoirAtlasRadianceData_A.HTextureAlloc("_ReservoirAtlasRadianceData_A", ProbeAtlasRes, GraphicsFormat.R32G32_UInt);
             SoftwareTracingShared.ReservoirAtlasRadianceData_B.HTextureAlloc("_ReservoirAtlasRadianceData_B", ProbeAtlasRes, GraphicsFormat.R32G32_UInt);
             SoftwareTracingShared.ReservoirAtlasRadianceData_C.HTextureAlloc("_ReservoirAtlasRadianceData_C", ProbeAtlasRes, GraphicsFormat.R32G32_UInt);
             SoftwareTracingShared.ReservoirAtlasRayData_A.HTextureAlloc("_ReservoirAtlasRayData_A", ProbeAtlasRes, GraphicsFormat.R32_UInt);
-            SoftwareTracingShared.ReservoirAtlasRayData_B.HTextureAlloc("_ReservoirAtlasRayData_B", ProbeAtlasRes, GraphicsFormat.R32_UInt, textureXrSlices * HConstants.PERSISTENT_HISTORY_SAMPLES, textureDimension: TextureDimension.Tex2DArray);
+            // SoftwareTracingShared.ReservoirAtlasRayData_B.HTextureAlloc("_ReservoirAtlasRayData_B", ProbeAtlasRes, GraphicsFormat.R32_UInt, HConstants.PERSISTENT_HISTORY_SAMPLES, textureDimension: TextureDimension.Tex2DArray);
+            SoftwareTracingShared.ReservoirAtlasRayData_B.HTextureAlloc("_ReservoirAtlasRayData_B", ProbeAtlasRes, GraphicsFormat.R32_UInt);
             SoftwareTracingShared.ReservoirAtlasRayData_C.HTextureAlloc("_ReservoirAtlasRayData_C", ProbeAtlasRes, GraphicsFormat.R32_UInt);
 
             // -------------------------------------- SHADOW GUIDANCE MASK RT -------------------------------------- //
@@ -348,12 +347,10 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
 
             ReleaseTextures();
 
-            int textureXrSlices = 1;
-
-            if (SoftwareTracingShared.IndirectCoordsSS == null) SoftwareTracingShared.IndirectCoordsSS = new HDynamicBuffer(BufferType.ComputeBuffer, 2 * sizeof(uint), textureXrSlices, avoidDownscale: true);
-            if (SoftwareTracingShared.IndirectCoordsWS == null) SoftwareTracingShared.IndirectCoordsWS = new HDynamicBuffer(BufferType.ComputeBuffer, 2 * sizeof(uint), textureXrSlices, avoidDownscale: true);
-            if (SoftwareTracingShared.IndirectCoordsOV == null) SoftwareTracingShared.IndirectCoordsOV = new HDynamicBuffer(BufferType.ComputeBuffer, 2 * sizeof(uint), textureXrSlices, avoidDownscale: true);
-            if (SoftwareTracingShared.IndirectCoordsSF == null) SoftwareTracingShared.IndirectCoordsSF = new HDynamicBuffer(BufferType.ComputeBuffer, 2 * sizeof(uint), textureXrSlices, avoidDownscale: true);
+            if (SoftwareTracingShared.IndirectCoordsSS == null) SoftwareTracingShared.IndirectCoordsSS = new HDynamicBuffer(BufferType.ComputeBuffer, 2 * sizeof(uint), 1, avoidDownscale: true);
+            if (SoftwareTracingShared.IndirectCoordsWS == null) SoftwareTracingShared.IndirectCoordsWS = new HDynamicBuffer(BufferType.ComputeBuffer, 2 * sizeof(uint), 1, avoidDownscale: true);
+            if (SoftwareTracingShared.IndirectCoordsOV == null) SoftwareTracingShared.IndirectCoordsOV = new HDynamicBuffer(BufferType.ComputeBuffer, 2 * sizeof(uint), 1, avoidDownscale: true);
+            if (SoftwareTracingShared.IndirectCoordsSF == null) SoftwareTracingShared.IndirectCoordsSF = new HDynamicBuffer(BufferType.ComputeBuffer, 2 * sizeof(uint), 1, avoidDownscale: true);
         }
 
         internal static void AllocationHashBuffers(bool onlyRelease = false)
@@ -392,6 +389,8 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
             }
         }
 
+
+		private bool isFirstFrame = true;
         public override void Execute(ScriptableRenderContext renderContext, ref RenderingData renderingData)
         {
 
@@ -420,15 +419,24 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
 
                 // URP中没有HDRP的GetPreviousFrameRT，通过ColorPreviousFrame RT手动管理历史帧
                 // 对应HDRP的ctx.hdCamera.GetPreviousFrameRT(HDCameraFrameHistoryType.ColorBufferMipChain)
-                RenderTexture previousColorBuffer = SoftwareTracingShared.ColorPreviousFrame.rt;
+                // RenderTexture previousColorBuffer = SoftwareTracingShared.ColorPreviousFrame.rt;
 
+                RTHandle currentFrame = cameraColorBuffer;
+                RTHandle previousFrame = SoftwareTracingShared.ColorPreviousFrame.rt;
+                if (isFirstFrame)
+                {
+                    cmd.Blit(currentFrame, previousFrame);
+                    cmd.GenerateMips(previousFrame);
+                    isFirstFrame = false;
+                }
                 // URP中Forward模式下diffuseBuffer为null
                 // URP没有Deferred模式的GBuffer0，统一为null或从全局纹理获取
-                Texture diffuseBuffer = Shader.GetGlobalTexture(HShaderParams.g_HTraceGBuffer0);
-
-                SoftwareTracingShared.Execute(cmd, camera, width, height, cameraColorBuffer, previousColorBuffer, diffuseBuffer, renderingData);
+                // Texture diffuseBuffer = Shader.GetGlobalTexture(HShaderParams.g_HTraceGBuffer0);
+                Texture diffuseBuffer = null;
+                SoftwareTracingShared.Execute(cmd, camera, width, height, cameraColorBuffer, previousFrame, diffuseBuffer, renderingData);
                 SoftwareTracingShared.History.Update();
-
+                cmd.Blit(currentFrame, previousFrame);
+                cmd.GenerateMips(previousFrame); // 生成 Mip Chain
                 renderContext.ExecuteCommandBuffer(cmd);
             }
             finally

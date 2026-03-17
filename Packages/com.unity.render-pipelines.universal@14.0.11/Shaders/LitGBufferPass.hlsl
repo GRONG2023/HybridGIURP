@@ -180,6 +180,8 @@ Varyings LitGBufferPassVertex(Attributes input)
     return output;
 }
 
+// TEXTURE2D(_HTraceBufferGI);
+
 // Used in Standard (Physically Based) shader
 FragmentOutput LitGBufferPassFragment(Varyings input)
 {
@@ -221,7 +223,9 @@ FragmentOutput LitGBufferPassFragment(Varyings input)
     Light mainLight = GetMainLight(inputData.shadowCoord, inputData.positionWS, inputData.shadowMask);
     MixRealtimeAndBakedGI(mainLight, inputData.normalWS, inputData.bakedGI, inputData.shadowMask);
     half3 color = GlobalIllumination(brdfData, inputData.bakedGI, surfaceData.occlusion, inputData.positionWS, inputData.normalWS, inputData.viewDirectionWS);
-
+    // half3 color = SAMPLE_TEXTURE2D(_HTraceBufferGI, sampler_LinearClamp, input.uv);
+    
+    // return BRDFDataToGbuffer(brdfData, inputData, surfaceData.smoothness, half3(0,1,0), surfaceData.occlusion);
     return BRDFDataToGbuffer(brdfData, inputData, surfaceData.smoothness, surfaceData.emission + color, surfaceData.occlusion);
 }
 

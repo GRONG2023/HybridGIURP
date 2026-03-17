@@ -36,7 +36,6 @@ namespace HTraceWSGI.Scripts.Extensions
 		public static ComputeShader LoadComputeShader(string shaderName)
 		{
 			var computeShader = (ComputeShader)Resources.Load($"HTraceWSGI/Computes/{shaderName}");
-			Debug.Log("LoadComputeShader  "+ shaderName);
 			if (computeShader == null)
 			{
 				Debug.LogError($"{shaderName} is missing in HTraceWSGI/Resources/Computes folder");

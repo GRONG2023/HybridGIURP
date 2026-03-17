@@ -571,7 +571,7 @@ namespace UnityEngine.Rendering.Universal.Internal
             // which prevents from resolving correct pass indices.
             if (m_StencilDeferredPasses[0] < 0)
                 InitStencilDeferredMaterial();
-
+        
             var cmd = renderingData.commandBuffer;
             using (new ProfilingScope(cmd, m_ProfilingDeferredPass))
             {
@@ -582,7 +582,7 @@ namespace UnityEngine.Rendering.Universal.Internal
 
                 // This must be set for each eye in XR mode multipass.
                 SetupMatrixConstants(cmd, ref renderingData);
-
+    
                 // Firt directional light will apply SSAO if possible, unless there is none.
                 if (!HasStencilLightsOfType(LightType.Directional))
                     RenderSSAOBeforeShading(cmd, ref renderingData);
@@ -731,6 +731,7 @@ namespace UnityEngine.Rendering.Universal.Internal
 
         void RenderStencilLights(ScriptableRenderContext context, CommandBuffer cmd, ref RenderingData renderingData)
         {
+
             if (m_stencilVisLights.Length == 0)
                 return;
 
@@ -776,7 +777,7 @@ namespace UnityEngine.Rendering.Universal.Internal
                 m_FullscreenMesh = CreateFullscreenMesh();
 
             cmd.EnableShaderKeyword(ShaderKeywordStrings._DIRECTIONAL);
-
+            
             // Directional lights.
             bool isFirstLight = true;
 
@@ -912,7 +913,7 @@ namespace UnityEngine.Rendering.Universal.Internal
         {
             if (m_HemisphereMesh == null)
                 m_HemisphereMesh = CreateHemisphereMesh();
-
+    
             cmd.EnableShaderKeyword(ShaderKeywordStrings._SPOT);
             for (int soffset = m_stencilVisLightOffsets[(int)LightType.Spot]; soffset < m_stencilVisLights.Length; ++soffset)
             {

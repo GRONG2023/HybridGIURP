@@ -10,6 +10,7 @@
 #include "../Includes/ScreenTraversal.hlsl"
 #include "../Includes/VoxelTraversal.hlsl"
 
+
 H_TEXTURE(_SampleCount);
 H_TEXTURE(_ProbeNormalDepth);
 H_TEXTURE(_ShadowGuidanceMask);

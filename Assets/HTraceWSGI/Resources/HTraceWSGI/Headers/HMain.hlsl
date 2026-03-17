@@ -101,6 +101,7 @@ struct DirectionalLightData
     float4 surfaceTextureScaleOffset;
 };
 
+
 StructuredBuffer<DirectionalLightData> _DirectionalLightDatas;
 
 #define HRenderScale _HRenderScale

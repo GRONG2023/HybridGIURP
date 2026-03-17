@@ -167,7 +167,6 @@ namespace HTraceWSGI.Scripts.Services.VoxelCameras
 
 		private void UpdateCameraFromUI()
 		{
-			Debug.Log("UpdateCameraFromUI");
 			_dirtyBounds = true;
 		}
 

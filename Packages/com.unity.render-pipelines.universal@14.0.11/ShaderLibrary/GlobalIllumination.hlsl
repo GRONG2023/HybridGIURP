@@ -17,6 +17,7 @@
     #define _MIXED_LIGHTING_SUBTRACTIVE
 #endif
 
+
 // Samples SH L0, L1 and L2 terms
 half3 SampleSH(half3 normalWS)
 {

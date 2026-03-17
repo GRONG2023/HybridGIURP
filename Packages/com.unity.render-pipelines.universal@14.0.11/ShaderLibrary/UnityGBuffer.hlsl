@@ -234,6 +234,7 @@ FragmentOutput BRDFDataToGbuffer(BRDFData brdfData, InputData inputData, half sm
     output.GBuffer2 = half4(packedNormalWS, smoothness);                             // encoded-normal    encoded-normal  encoded-normal  smoothness
     
     output.GBuffer3 = half4(globalIllumination, 1);                                  // GI                GI              GI              unused          (lighting buffer)
+    // output.GBuffer3 = half4(0,0,0, 1);                                  // GI                GI              GI              unused          (lighting buffer)
     #if _RENDER_PASS_ENABLED
     output.GBuffer4 = inputData.positionCS.z;
     #endif

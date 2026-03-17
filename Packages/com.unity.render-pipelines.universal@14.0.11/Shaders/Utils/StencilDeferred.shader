@@ -438,18 +438,21 @@ Shader "Hidden/Universal Render Pipeline/StencilDeferred"
 
             // -------------------------------------
             // Render State Commands
-            ZTest NotEqual
+            //ZTest NotEqual
             ZWrite Off
+            ZTest Always
             Cull Off
-            Blend One SrcAlpha, Zero One
-            BlendOp Add, Add
+            Blend Off
+            // Blend One SrcAlpha, Zero One
+            // BlendOp Add, Add
 
             HLSLPROGRAM
+
             #pragma target 4.5
 
             // Deferred Rendering Path does not support the OpenGL-based graphics API:
             // Desktop OpenGL, OpenGL ES 3.0, OpenGL ES 2.0, WebGL 2.0.
-            #pragma exclude_renderers gles gles3 glcore
+            // #pragma exclude_renderers gles gles3 glcore
 
             // -------------------------------------
             // Shader Stages
@@ -457,17 +460,83 @@ Shader "Hidden/Universal Render Pipeline/StencilDeferred"
             #pragma fragment FragSSAOOnly
 
             // -------------------------------------
-            // Defines
-            #define _SSAO_ONLY
-
-            // -------------------------------------
-            // Universal Pipeline keywords
-            #pragma multi_compile _ _SCREEN_SPACE_OCCLUSION
-
-            // -------------------------------------
             // Includes
-            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/Shaders/Utils/StencilDeferred.hlsl"
+            // #include_with_pragmas "Packages/com.unity.render-pipelines.universal/Shaders/Utils/StencilDeferred.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/Utils/Deferred.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
 
+                    
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                uint vertexID : SV_VertexID;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+                float3 screenUV : TEXCOORD1;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+                UNITY_VERTEX_OUTPUT_STEREO
+            };
+
+            #if defined(_SPOT)
+            float4 _SpotLightScale;
+            float4 _SpotLightBias;
+            float4 _SpotLightGuard;
+            #endif
+
+            Varyings Vertex(Attributes input)
+            {
+                Varyings output = (Varyings)0;
+
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+
+                float3 positionOS = input.positionOS.xyz;
+
+                #if defined(_SPOT)
+                // Spot lights have an outer angle than can be up to 180 degrees, in which case the shape
+                // becomes a capped hemisphere. There is no affine transforms to handle the particular cone shape,
+                // so instead we will adjust the vertices positions in the vertex shader to get the tighest fit.
+                [flatten] if (any(positionOS.xyz))
+                {
+                    // The hemisphere becomes the rounded cap of the cone.
+                    positionOS.xyz = _SpotLightBias.xyz + _SpotLightScale.xyz * positionOS.xyz;
+                    positionOS.xyz = normalize(positionOS.xyz) * _SpotLightScale.w;
+                    // Slightly inflate the geometry to fit the analytic cone shape.
+                    // We want the outer rim to be expanded along xy axis only, while the rounded cap is extended along all axis.
+                    positionOS.xyz = (positionOS.xyz - float3(0, 0, _SpotLightGuard.w)) * _SpotLightGuard.xyz + float3(0, 0, _SpotLightGuard.w);
+                }
+                #endif
+                output.positionCS = float4(positionOS.xy, UNITY_RAW_FAR_CLIP_VALUE, 1.0); // Force triangle to be on zfar
+
+                output.screenUV = output.positionCS.xyw;
+                #if UNITY_UV_STARTS_AT_TOP
+                output.screenUV.xy = output.screenUV.xy * float2(0.5, -0.5) + 0.5 * output.screenUV.z;
+                #else
+                output.screenUV.xy = output.screenUV.xy * 0.5 + 0.5 * output.screenUV.z;
+                #endif
+
+                return output;
+            }
+            
+            
+            TEXTURE2D(_HTraceBufferGI);
+
+            half4 FragSSAOOnly(Varyings input) : SV_Target
+            {
+                // UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+                    
+                 float2 screen_uv = (input.screenUV.xy / input.screenUV.z);
+            
+
+                 half3 diffuseLighting = SAMPLE_TEXTURE2D(_HTraceBufferGI, sampler_LinearClamp, screen_uv);
+                return half4(diffuseLighting,1.0);
+            }
             ENDHLSL
         }
     }

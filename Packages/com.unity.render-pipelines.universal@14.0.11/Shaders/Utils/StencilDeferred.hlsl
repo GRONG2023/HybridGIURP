@@ -320,6 +320,7 @@
         return half4(color, alpha);
     }
 
+
     half4 FragFog(Varyings input) : SV_Target
     {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
@@ -338,16 +339,13 @@
 
     half4 FragSSAOOnly(Varyings input) : SV_Target
     {
-        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+        // UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+            return half4(1.0,0.0,0.0,1.0);
+        // float2 screen_uv = (input.screenUV.xy / input.screenUV.z);
+    
 
-        float2 screen_uv = (input.screenUV.xy / input.screenUV.z);
-        AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(screen_uv);
-        half surfaceDataOcclusion = SAMPLE_TEXTURE2D_X_LOD(_GBuffer1, my_point_clamp_sampler, screen_uv, 0).a;
-        // What we want is really to apply the mininum occlusion value between the baked occlusion from surfaceDataOcclusion and real-time occlusion from SSAO.
-        // But we already applied the baked occlusion during gbuffer pass, so we have to cancel it out here.
-        // We must also avoid divide-by-0 that the reciprocal can generate.
-        half occlusion = aoFactor.indirectAmbientOcclusion < surfaceDataOcclusion ? aoFactor.indirectAmbientOcclusion * rcp(surfaceDataOcclusion) : 1.0;
-        return half4(0.0, 0.0, 0.0, occlusion);
+        // half3 diffuseLighting = SAMPLE_TEXTURE2D(_HTraceBufferGI, sampler_LinearClamp, screen_uv);
+    
     }
 
 #endif //UNIVERSAL_STENCIL_DEFERRED
