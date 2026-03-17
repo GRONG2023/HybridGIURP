@@ -1,0 +1,108 @@
+#pragma kernel Debug
+
+#include "../Headers/HMain.hlsl"
+
+// Input bufferes
+H_TEXTURE(_HTraceBufferGI);
+H_TEXTURE(_GeometryNormal);
+H_TEXTURE(_HTraceBufferVoxelVisualization);
+//H_TEXTURE(g_HTraceShadowmap);
+H_TEXTURE(g_LightClusterDebug);
+
+
+//UNITY_DECLARE_SHADOWMAP (g_HTraceShadowmap);
+SamplerComparisonState  sampler_g_HTraceShadowmap;
+Texture2D<float> g_HTraceShadowmap;
+float4x4 g_DirLightMatrix;
+// sampler_ShadowMapTexture;
+//H_TEXTURE(_ShadowmapAtlas);
+
+float4 g_HTraceShadowmap_TexelSize;
+#define SHADOWMAPSAMPLER_AND_TEXELSIZE_DEFINED
+
+// Output buffers
+H_RW_TEXTURE(float4, _Debug_Output);
+
+int _DebugSwitch;
+int _BuffersSwitch;
+
+void DebugFinal(uint3 pixCoord)
+{    
+    if (_DebugSwitch == 1) // MainBuffers
+    {
+        if (_BuffersSwitch == 0) // Multi
+        {
+            uint2 quadSize = _ScreenSize / 2;
+            uint2 quadIndex = pixCoord.xy / quadSize; // (0,0), (1,0), (0,1), (1,1)
+            uint2 localCoord = pixCoord.xy % quadSize;
+            uint2 sampleCoord = localCoord * 2;
+        
+            float4 outputColor = float4(0, 0, 0, 1);
+        
+            if (quadIndex.x == 0 && quadIndex.y == 0) // Bot Left
+            {
+                outputColor = float4(HBUFFER_NORMAL_WS(sampleCoord).xyz, 1);
+            }
+            else if (quadIndex.x == 1 && quadIndex.y == 0) // Bot right
+            {
+                float2 motionVector = HBUFFER_MOTION_VECTOR(sampleCoord).xy;
+                float motionMask = 0.0;
+                outputColor = float4(motionVector, motionMask, 1);
+            }
+            else if (quadIndex.x == 0 && quadIndex.y == 1) // Top left
+            {
+                outputColor = float4(HBUFFER_DEPTH(sampleCoord).xxx, 1);
+            }
+            else if (quadIndex.x == 1 && quadIndex.y == 1) // Top right
+            {
+                outputColor = float4(HBUFFER_DIFFUSE(sampleCoord).xyz, 1);
+            }
+            
+            _Debug_Output[H_COORD(pixCoord.xy)] = outputColor;
+        }
+        if (_BuffersSwitch == 1) // Depth
+        {
+            _Debug_Output[H_COORD(pixCoord.xy)] = float4(HBUFFER_DEPTH(pixCoord.xy).xxx, 1);
+        }
+        if (_BuffersSwitch == 2) // Diffuse
+        {
+            _Debug_Output[H_COORD(pixCoord.xy)] = float4(HBUFFER_DIFFUSE(pixCoord.xy).xyz, 1);
+        }
+        if (_BuffersSwitch == 3) // Normal
+        {
+            _Debug_Output[H_COORD(pixCoord.xy)] = float4(HBUFFER_NORMAL_WS(pixCoord.xy).xyz, 1);
+        }
+        if (_BuffersSwitch == 4) // Motion Mask
+        {
+        }
+        if (_BuffersSwitch == 5)  // MV
+        {
+            _Debug_Output[H_COORD(pixCoord.xy)] = float4(HBUFFER_MOTION_VECTOR(pixCoord.xy).xy, 0, 1);
+        }
+    }
+
+    if (_DebugSwitch == 2) // GlobalIllumination
+        _Debug_Output[H_COORD(pixCoord.xy)] = H_LOAD(_HTraceBufferGI, pixCoord.xy);
+    
+    if (_DebugSwitch == 3) // GeometryNormals
+        _Debug_Output[H_COORD(pixCoord.xy)] = H_LOAD(_GeometryNormal, pixCoord.xy);
+    
+    if (_DebugSwitch == 4) // Shadowmap
+	    _Debug_Output[H_COORD(pixCoord.xy)] = H_LOAD(g_HTraceShadowmap, pixCoord.xy * (2048 / _ScreenSize.y)).x;
+
+    if (_DebugSwitch == 5) // VoxelizedColor
+        _Debug_Output[H_COORD(pixCoord.xy)] = H_LOAD(_HTraceBufferGI, pixCoord.xy);
+
+    if (_DebugSwitch == 6) // VoxelizedLighting
+        _Debug_Output[H_COORD(pixCoord.xy)] = H_LOAD(_HTraceBufferGI, pixCoord.xy);
+
+    if (_DebugSwitch == 7 || _DebugSwitch == 8) // LightCluster
+        _Debug_Output[H_COORD(pixCoord.xy)] = H_LOAD(g_LightClusterDebug, pixCoord.xy);
+}
+
+[numthreads(8, 8, 1)]
+void Debug(uint3 pixCoord : SV_DispatchThreadID)
+{
+
+    DebugFinal(pixCoord);
+}

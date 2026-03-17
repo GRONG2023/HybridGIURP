@@ -1,0 +1,20 @@
+#pragma kernel ShadowmapMerge
+
+#include "../Headers/HMain.hlsl"
+
+Texture2D _Shadowmap;
+RWTexture2D<float> _Shadowmap_Output;
+
+float2 _OctantShadowOffset;
+
+[numthreads(8, 8, 1)]
+void ShadowmapMerge(uint3 pixCoord : SV_DispatchThreadID, uint3 groupThreadID : SV_GroupThreadID)
+{
+    int2 ShadowmapSize = int2(2048, 2048);
+    int2 WriteCoord = pixCoord.xy + _OctantShadowOffset.xy;
+    
+    float ShadowmapOctant = _Shadowmap.Load(int3(pixCoord.xy, 0)).x; /// LOAD_TEXTURE2D(_Shadowmap, pixCoord.xy).x;
+
+    //TODO: PASHA CHECK IT
+    _Shadowmap_Output[WriteCoord] = ShadowmapOctant;
+}

@@ -1,0 +1,24 @@
+#pragma kernel CopyColor
+#pragma kernel CopyEmissives
+
+#include "../Headers/HMain.hlsl"
+
+H_TEXTURE(_ColorInput);
+H_TEXTURE(_EmissivesInput);
+
+H_RW_TEXTURE(float3, _ColorOutput);
+H_RW_TEXTURE(float3, _EmissivesOutput);
+
+// ------------------------ COPY COLOR (BIRP ONLY) ------------------------
+[numthreads(8, 8, 1)]
+void CopyColor(uint3 pixCoord : SV_DispatchThreadID)
+{
+    _ColorOutput[H_COORD(pixCoord.xy)] = H_LOAD(_ColorInput, pixCoord.xy); 
+}
+
+// ------------------------ COPY EMISSIVES (BIRP ONLY) ------------------------
+[numthreads(8, 8, 1)]
+void CopyEmissives(uint3 pixCoord : SV_DispatchThreadID)
+{
+    _EmissivesOutput[H_COORD(pixCoord.xy)] = H_LOAD(_EmissivesInput, pixCoord.xy); 
+}
