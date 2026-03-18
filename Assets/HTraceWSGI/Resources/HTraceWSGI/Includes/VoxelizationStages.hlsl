@@ -105,6 +105,7 @@ float3 RestoreAxis(float3 Position, uint Axis)
     return Position;
 }
 
+// #define SHADEROPTIONS_CAMERA_RELATIVE_RENDERING
 
 // --- Vertex Stage ---
 VertexToGeometry VoxelizationVert(Attributes inputMesh)
@@ -116,11 +117,13 @@ VertexToGeometry VoxelizationVert(Attributes inputMesh)
     inputMesh.positionOS *= _EmissiveScale;
  
     float3 PivotWS = GetAbsolutePositionWS(float3(UNITY_MATRIX_M[0].w, UNITY_MATRIX_M[1].w, UNITY_MATRIX_M[2].w));
-    
+        // PivotWS = float3(UNITY_MATRIX_M[0].w, UNITY_MATRIX_M[1].w, UNITY_MATRIX_M[2].w);
     // Process instancing
  
     PositionWS = mul(UNITY_MATRIX_M, float4(inputMesh.positionOS.xyz, 1.0)).xyz;
-
+    // #if (SHADEROPTIONS_CAMERA_RELATIVE_RENDERING != 0)
+    //     PositionWS -= _WorldSpaceCameraPos.xyz;
+    // #endif
     Output.PositionCS = TransformWorldToHClip(PositionWS);
     
 

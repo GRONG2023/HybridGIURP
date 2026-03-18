@@ -208,6 +208,7 @@ namespace UnityEngine.Rendering.Universal
         internal void SetViewAndProjectionMatrix(Matrix4x4 viewMatrix, Matrix4x4 projectionMatrix)
         {
             m_ViewMatrix = viewMatrix;
+            m_ViewMatrix.SetColumn(3, new Vector4(0, 0, 0, 1));
             m_ProjectionMatrix = projectionMatrix;
             m_JitterMatrix = Matrix4x4.identity;
         }
@@ -215,6 +216,11 @@ namespace UnityEngine.Rendering.Universal
         internal void SetViewProjectionAndJitterMatrix(Matrix4x4 viewMatrix, Matrix4x4 projectionMatrix, Matrix4x4 jitterMatrix)
         {
             m_ViewMatrix = viewMatrix;
+            // if (ShaderConfig.s_CameraRelativeRendering != 0)
+            {
+                // Zero out the translation component.
+                m_ViewMatrix.SetColumn(3, new Vector4(0, 0, 0, 1));
+            }
             m_ProjectionMatrix = projectionMatrix;
             m_JitterMatrix = jitterMatrix;
         }

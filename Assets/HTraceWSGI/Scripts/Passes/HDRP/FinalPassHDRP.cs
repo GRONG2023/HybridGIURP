@@ -44,7 +44,7 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
 
             public void Update()
             {
-                // URPÖÐ¹Ì¶¨Ê¹ÓÃR16G16B16A16_SFloat£¬Ã»ÓÐHDRPµÄcolorBufferFormatÉèÖÃ
+                // URPï¿½Ð¹Ì¶ï¿½Ê¹ï¿½ï¿½R16G16B16A16_SFloatï¿½ï¿½Ã»ï¿½ï¿½HDRPï¿½ï¿½colorBufferFormatï¿½ï¿½ï¿½ï¿½
                 GraphicsFormat = GraphicsFormat.R16G16B16A16_SFloat;
             }
         }
@@ -58,7 +58,7 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
             renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
         }
 
-        public void Setup(ScriptableRenderContext renderContext, CommandBuffer cmd)
+        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
             if (!_initialized)
             {
@@ -66,7 +66,7 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
                 if (HReflectionProbeCompose == null) HReflectionProbeCompose = HExtensions.LoadComputeShader("HReflectionProbeCompose");
 
                 OutputTarget?.HRelease();
-                // URPÖÐ¹Ì¶¨Ê¹ÓÃR16G16B16A16_SFloat
+                // URPï¿½Ð¹Ì¶ï¿½Ê¹ï¿½ï¿½R16G16B16A16_SFloat
                 OutputTarget.HTextureAlloc("_OutputTarget", Vector2.one, GraphicsFormat.R16G16B16A16_SFloat);
 
                 _initialized = true;
@@ -107,7 +107,7 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
                     cmd.SetComputeTextureParam(HDebug, (int)HDebugKernel.Debug, Debug_Output, OutputTarget.rt, 0);
                     cmd.SetComputeIntParam(HDebug, DebugSwitch, (int)HSettings.GeneralSettings.DebugModeWS);
                     cmd.SetComputeIntParam(HDebug, BuffersSwitch, (int)HSettings.GeneralSettings.HBuffer);
-                    // URPÖÐTextureXrSlices¹Ì¶¨Îª1
+                    // URPï¿½ï¿½TextureXrSlicesï¿½Ì¶ï¿½Îª1
                     cmd.DispatchCompute(HDebug, (int)HDebugKernel.Debug, Mathf.CeilToInt(width / 8.0f), Mathf.CeilToInt(height / 8.0f), 1);
 
                     Blitter.BlitCameraTexture(cmd, OutputTarget.rt, cameraColorBuffer);
@@ -125,7 +125,7 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
 
         private void ReallocateConditions(int width, int height)
         {
-            // URPÖÐ¹Ì¶¨Ê¹ÓÃR16G16B16A16_SFloat£¬²»ÐèÒª¼ì²écolorBufferFormat
+            // URPï¿½Ð¹Ì¶ï¿½Ê¹ï¿½ï¿½R16G16B16A16_SFloatï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½colorBufferFormat
             var graphicsFormat = GraphicsFormat.R16G16B16A16_SFloat;
             if (History.GraphicsFormat != graphicsFormat)
             {

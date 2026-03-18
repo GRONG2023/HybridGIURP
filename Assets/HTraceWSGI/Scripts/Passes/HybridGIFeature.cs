@@ -12,6 +12,7 @@ public class HybridGIFeature : ScriptableRendererFeature
     private DirectionalShadowmapPassHDRP _directionalShadowmapPass;
     private VoxelizationPassHDRP _voxelizationPass;
     private SoftwareTracingPassHDRP _softwareTracingPass;
+    private ColorHistoryPass _colorHistoryPass;
     private FinalPassHDRP _finalDebugPass;
 
     /// <inheritdoc/>
@@ -23,6 +24,7 @@ public class HybridGIFeature : ScriptableRendererFeature
         _directionalShadowmapPass = new DirectionalShadowmapPassHDRP();
         _voxelizationPass = new VoxelizationPassHDRP();
         _softwareTracingPass = new SoftwareTracingPassHDRP();
+        _colorHistoryPass = new ColorHistoryPass();
         _finalDebugPass = new FinalPassHDRP();
 
         // Configures where the render pass should be injected.
@@ -32,6 +34,7 @@ public class HybridGIFeature : ScriptableRendererFeature
         _directionalShadowmapPass.renderPassEvent = RenderPassEvent.AfterRenderingGbuffer + 3;
         _voxelizationPass.renderPassEvent = RenderPassEvent.AfterRenderingGbuffer + 4;
         _softwareTracingPass.renderPassEvent = RenderPassEvent.AfterRenderingGbuffer + 5;
+        _colorHistoryPass.renderPassEvent = RenderPassEvent.AfterRenderingDeferredLights;
         _finalDebugPass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
     }
 
@@ -45,7 +48,8 @@ public class HybridGIFeature : ScriptableRendererFeature
         renderer.EnqueuePass(_directionalShadowmapPass);
         renderer.EnqueuePass(_voxelizationPass);
         renderer.EnqueuePass(_softwareTracingPass);
-        //renderer.EnqueuePass(_finalDebugPass);
+        renderer.EnqueuePass(_colorHistoryPass);
+        renderer.EnqueuePass(_finalDebugPass);
     }
 
     protected override void Dispose(bool disposing)
@@ -74,6 +78,14 @@ public class HybridGIFeature : ScriptableRendererFeature
         if (_softwareTracingPass != null)
         {
             _softwareTracingPass.Cleanup();
+        }
+        if (_colorHistoryPass != null)
+        {
+            _colorHistoryPass.Cleanup();
+        }
+        if (_finalDebugPass != null)
+        {
+            _finalDebugPass.Cleanup();
         }
     }
 }

@@ -647,14 +647,14 @@ namespace HTraceWSGI.Scripts.Passes.Shared
             
      
         
-            // TDR timeout protection
-            if (SkipFirstFrame 
-                || History.TracingMode != HSettings.GeneralSettings.TracingMode
-                || History.RayCountMode != HSettings.GeneralSettings.RayCountMode)
-            {
-	            SkipFirstFrame = false;
-                return;
-            }
+            // // TDR timeout protection
+            // if (SkipFirstFrame 
+            //     || History.TracingMode != HSettings.GeneralSettings.TracingMode
+            //     || History.RayCountMode != HSettings.GeneralSettings.RayCountMode)
+            // {
+	        //     SkipFirstFrame = false;
+            //     return;
+            // }
             
             // ---------------------------------------- WORLD SPACE LIGHTING ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_WorldSpaceLightingProfilingSampler))
@@ -706,6 +706,10 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                     }
                 }
             } 
+
+            //             cmd.Blit(HitRadiance.rt, RadianceAccumulated.rt);
+            //   cmd.SetGlobalTexture(HShaderParams.g_HTraceBufferGI, RadianceAccumulated.rt);
+            // return;
 
             // ---------------------------------------- RADIANCE CACHING ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_RadianceCachingProfilingSampler))
@@ -769,6 +773,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 }
                 
             }
+
 
  
             // ---------------------------------------- SPATIAL PREPASS ---------------------------------------- //

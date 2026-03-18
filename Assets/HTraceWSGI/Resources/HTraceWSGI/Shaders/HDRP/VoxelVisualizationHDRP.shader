@@ -12,7 +12,7 @@ Shader "Hidden/HTraceWSGI/VoxelVisualizationHDRP"
     #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
 
     float4x4 _DebugCameraFrustum;
-    float4 _DebugCameraFrustumArray[8];
+    // float4 _DebugCameraFrustumArray[8];
 
     struct Attributes2
     {
@@ -29,17 +29,18 @@ Shader "Hidden/HTraceWSGI/VoxelVisualizationHDRP"
     {
         Varyings2 output;
 
-        // URP È«ÆÁÈý½ÇÐÎ¶¥µã
+        // URP È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¶ï¿½ï¿½ï¿½
         float4 positionCS = GetFullScreenTriangleVertexPosition(input.vertexID);
         output.positionCS = positionCS;
 
-        // ½«×ø±êÓ³Éäµ½ 0~1
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó³ï¿½äµ½ 0~1
         float2 uv = positionCS.xy * 0.5 + 0.5;
 
-        // ¸ù¾Ý UV ¼ÆËãË÷Òý
+        // ï¿½ï¿½ï¿½ï¿½ UV ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         int index = (uv.x / 2.0f) + uv.y;
 
-        output.ray = _DebugCameraFrustumArray[index].xyz;
+        output.ray = _DebugCameraFrustum[index].xyz;
+        // output.ray = _DebugCameraFrustumArray[index].xyz;
 
         return output;
     }

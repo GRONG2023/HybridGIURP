@@ -583,9 +583,9 @@ namespace UnityEngine.Rendering.Universal.Internal
                 // This must be set for each eye in XR mode multipass.
                 SetupMatrixConstants(cmd, ref renderingData);
     
-                // Firt directional light will apply SSAO if possible, unless there is none.
-                if (!HasStencilLightsOfType(LightType.Directional))
-                    RenderSSAOBeforeShading(cmd, ref renderingData);
+                // // Firt directional light will apply SSAO if possible, unless there is none.
+                // if (!HasStencilLightsOfType(LightType.Directional))
+                //     RenderSSAOBeforeShading(cmd, ref renderingData);
 
                 RenderStencilLights(context, cmd, ref renderingData);
 

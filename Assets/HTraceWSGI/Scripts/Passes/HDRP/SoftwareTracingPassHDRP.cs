@@ -64,8 +64,8 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
         {
             void ReleaseTextures()
             {
-                SoftwareTracingShared.ColorPreviousFrame.HRelease();
-
+                // ColorPreviousFrame is now managed by ColorHistoryPass
+                
                 SoftwareTracingShared.VoxelPayload.HRelease();
                 SoftwareTracingShared.RayDirections.HRelease();
                 SoftwareTracingShared.HitRadiance.HRelease();
@@ -187,7 +187,8 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
             if (SoftwareTracingShared.HashBuffer_Radiance == null) SoftwareTracingShared.HashBuffer_Radiance = new ComputeBuffer(HConstants.HASH_STORAGE_SIZE, 4 * sizeof(uint));
             if (SoftwareTracingShared.HashBuffer_Position == null) SoftwareTracingShared.HashBuffer_Position = new ComputeBuffer(HConstants.HASH_STORAGE_SIZE, 4 * sizeof(uint));
 
-            SoftwareTracingShared.ColorPreviousFrame.HTextureAlloc("_ColorPreviousFrame", Vector2.one, GraphicsFormat.B10G11R11_UFloatPack32, useMipMap: true);
+            // ColorPreviousFrame is now managed by ColorHistoryPass
+            // SoftwareTracingShared.ColorPreviousFrame.HTextureAlloc("_ColorPreviousFrame", Vector2.one, GraphicsFormat.B10G11R11_UFloatPack32, useMipMap: true);
 
             // -------------------------------------- TRACING RT -------------------------------------- //
             SoftwareTracingShared.VoxelPayload.HTextureAlloc("_VoxelPayload", ProbeAtlasRes, GraphicsFormat.R32G32_UInt);
@@ -391,6 +392,10 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
 
 
 		private bool isFirstFrame = true;
+        
+		private Matrix4x4 prevViewProjMatrix;
+		public Matrix4x4 prevInvViewProjMatrix;
+
         public override void Execute(ScriptableRenderContext renderContext, ref RenderingData renderingData)
         {
 
@@ -421,22 +426,48 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
                 // 对应HDRP的ctx.hdCamera.GetPreviousFrameRT(HDCameraFrameHistoryType.ColorBufferMipChain)
                 // RenderTexture previousColorBuffer = SoftwareTracingShared.ColorPreviousFrame.rt;
 
+			Matrix4x4 currentViewMatrix = camera.worldToCameraMatrix;
+            // Debug.Log("currentViewMatrix = "+currentViewMatrix);
+			currentViewMatrix.SetColumn(3, new Vector4(0, 0, 0, 1));
+            // Debug.Log("currentViewMatrix2 = "+currentViewMatrix);
+			Matrix4x4 currentProjMatrix = GL.GetGPUProjectionMatrix(camera.projectionMatrix, true); // Had to change this from 'false'
+			Matrix4x4 currentViewProjMatrix = currentProjMatrix * currentViewMatrix;
+
+			if (isFirstFrame)
+			{
+				// 首帧：使用当前矩阵初始化
+				prevViewProjMatrix = currentViewProjMatrix;
+				prevInvViewProjMatrix = currentViewProjMatrix.inverse;
+				isFirstFrame = false;
+			}
+			else
+			{
+				// 后续帧：使用前一帧的VP矩阵计算逆矩阵
+				prevInvViewProjMatrix = prevViewProjMatrix.inverse;
+			}
+			
+
+			// 设置全局矩阵供着色器使用
+ 			cmd.SetGlobalMatrix(HShaderParams._PrevInvViewProjMatrix, prevInvViewProjMatrix);
+
                 RTHandle currentFrame = cameraColorBuffer;
                 RTHandle previousFrame = SoftwareTracingShared.ColorPreviousFrame.rt;
-                if (isFirstFrame)
-                {
-                    cmd.Blit(currentFrame, previousFrame);
-                    cmd.GenerateMips(previousFrame);
-                    isFirstFrame = false;
-                }
+                // previousFrame = null;
+                // if (isFirstFrame && previousFrame != null)
+                // {
+                //     cmd.Blit(currentFrame, previousFrame);
+                //     cmd.GenerateMips(previousFrame);
+                //     isFirstFrame = false;
+                // }
                 // URP中Forward模式下diffuseBuffer为null
                 // URP没有Deferred模式的GBuffer0，统一为null或从全局纹理获取
                 // Texture diffuseBuffer = Shader.GetGlobalTexture(HShaderParams.g_HTraceGBuffer0);
                 Texture diffuseBuffer = null;
-                SoftwareTracingShared.Execute(cmd, camera, width, height, cameraColorBuffer, previousFrame, diffuseBuffer, renderingData);
+                SoftwareTracingShared.Execute(cmd, camera, width, height, cameraColorBuffer, null, diffuseBuffer, renderingData);
+                // SoftwareTracingShared.Execute(cmd, camera, width, height, cameraColorBuffer, previousFrame, diffuseBuffer, renderingData);
                 SoftwareTracingShared.History.Update();
-                cmd.Blit(currentFrame, previousFrame);
-                cmd.GenerateMips(previousFrame); // 生成 Mip Chain
+                // cmd.Blit(currentFrame, previousFrame);
+                // cmd.GenerateMips(previousFrame); // 生成 Mip Chain
                 renderContext.ExecuteCommandBuffer(cmd);
             }
             finally

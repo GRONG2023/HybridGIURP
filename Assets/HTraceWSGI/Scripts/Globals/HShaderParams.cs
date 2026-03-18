@@ -23,6 +23,8 @@ namespace HTraceWSGI.Scripts.Globals
 		public static readonly int g_CameraDepthTexture          = Shader.PropertyToID("_CameraDepthTexture");
 		public static readonly int g_CameraNormalsTexture        = Shader.PropertyToID("_CameraNormalsTexture");
 		
+		public static int _PrevInvViewProjMatrix           = Shader.PropertyToID("_PrevInvViewProjMatrix");
+
 		public static readonly int g_VoxelPositionPyramid      = Shader.PropertyToID("_VoxelPositionPyramid");
 		public static readonly int g_ProbeSize                 = Shader.PropertyToID("_ProbeSize");
 		public static readonly int g_OctahedralSize            = Shader.PropertyToID("_OctahedralSize");
