@@ -36,7 +36,7 @@ void GatherSH(uint3 pixCoord : SV_DispatchThreadID)
 
     uint2 Unused;
     float3 Normal = UnpackNormalDepth(asuint(H_LOAD(_ProbeNormalDepth, pixCoord.xy)).xy, Unused).xyz;
-    
+   
     // Accumulate all cells to SH
     for (int x = 0; x < _OctahedralSize; x++)
     {
@@ -50,10 +50,10 @@ void GatherSH(uint3 pixCoord : SV_DispatchThreadID)
             // Unpack radiance and W
             float3 ReservoirRadiance = UnpackTonemappedColor24bit(RadianceDataPacked.x);
             float ReservoirW = f16tof32(RadianceDataPacked.y >> 16);
-            
+       
             // Calculate octahedral ray direction
             float3 RayDirection = OrientedOctahedronToDirection((float2(x, y) + 0.5f) / float(_OctahedralSize), Normal);
-
+           
             // Use reservoir ray direction instead (optional)
             if (USE_RESERVOIR_RAY_DIRECTION)
             {

@@ -18,6 +18,7 @@ H_RW_TEXTURE(uint2, _ReservoirAtlasRadianceData_Output);
 H_TEXTURE(_ReservoirAtlas);
 H_TEXTURE_ARRAY(_ReservoirAtlas_History);
 H_RW_TEXTURE(uint4, _ReservoirAtlas_Output);
+H_RW_TEXTURE(float4, _ReservoirAtlas_Output_Debug);
 H_RW_TEXTURE_ARRAY(uint4, _ReservoirAtlas_ArrayOutput);
 
 uint _UseDiffuseWeight;

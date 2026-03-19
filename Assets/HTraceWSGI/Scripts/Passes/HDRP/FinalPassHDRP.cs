@@ -94,7 +94,7 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
                 RTHandle cameraColorBuffer = renderer.cameraColorTargetHandle;
 
                 VoxelizationPassHDRP.VisualizeVoxels(cmd, camera, width, height, renderContext);
-                Shared.LightClusterShared.DebugLightCluster(cmd, camera, width, height);
+                // Shared.LightClusterShared.DebugLightCluster(cmd, camera, width, height);
 
                 if (HSettings.GeneralSettings.DebugModeWS == DebugModeWS.None)
                     return;

@@ -67,8 +67,11 @@ void ProbeAtlasTemporalReuse(uint3 pixCoord : SV_DispatchThreadID, uint2 groupTh
     Reservoir Reservoir;
     ReservoirInitialize(pixCoord.xy, Reservoir);
 
+    float sourcePDF = 1.0;
+    float targetPDF = Luminance(Radiance * Diffuse);
+
     Reservoir.Radiance.Color = Radiance;
-    Reservoir.Radiance.Wsum = Luminance(Radiance * Diffuse);
+    Reservoir.Radiance.Wsum = targetPDF/sourcePDF;
     Reservoir.Radiance.W = 0;
     Reservoir.Radiance.M = 1;
 
@@ -113,7 +116,7 @@ void ProbeAtlasTemporalReuse(uint3 pixCoord : SV_DispatchThreadID, uint2 groupTh
     
     // Merge with center reservoir
     uint4 Merged = 0;
-    if (!DISABLE_RESTIR_TEMPORAL)
+    // if (!DISABLE_RESTIR_TEMPORAL)
     {
         Merged.x = ReservoirMergeTemporal(CellTapCoord00, ReservoirHistoryPacked00, GetHistoryIndex(ReprojectionIndex), ReprojectionWeights.x, Diffuse, ReservoirUpdateRandom, Reservoir);
         Merged.y = ReservoirMergeTemporal(CellTapCoord01, ReservoirHistoryPacked01, GetHistoryIndex(ReprojectionIndex), ReprojectionWeights.y, Diffuse, ReservoirUpdateRandom, Reservoir);
@@ -158,7 +161,8 @@ void ProbeAtlasTemporalReuse(uint3 pixCoord : SV_DispatchThreadID, uint2 groupTh
         
         // Move along the ray with fixed steps
         float3 PositionLocalWS = PositionWS + ResDirection * 0.01 * float(i);
-        float3 PositionNDC = H_COMPUTE_NDC_Z(PositionLocalWS, UNITY_MATRIX_VP).xyz;
+
+        float3 PositionNDC = H_COMPUTE_NDC_Z(PositionLocalWS, H_MATRIX_VP).xyz;
         
         if (all(PositionNDC.xy > 0) && all(PositionNDC.xy < 1))
         {
@@ -243,6 +247,7 @@ void ProbeAtlasTemporalReuse(uint3 pixCoord : SV_DispatchThreadID, uint2 groupTh
 
     // Output reservoir atlas for history
     _ReservoirAtlas_Output[H_COORD(pixCoord.xy)] = uint4(RadianceDataPacked.xy, RayDataPacked.xy);
+    _ReservoirAtlas_Output_Debug[H_COORD(pixCoord.xy)] = float4(PositionWS,1);
 
     // if (all(Merged == 0))
     //     Test = 1; 
@@ -271,7 +276,7 @@ void ProbeAtlasSpatialReuse(uint3 pixCoord : SV_DispatchThreadID, uint2 groupThr
     // Initialize reservoir
     Reservoir Reservoir;
     ReservoirInitialize(pixCoord.xy, Reservoir);
-
+  _ReservoirAtlas_Output_Debug[H_COORD(pixCoord.xy)] = float4(Reservoir.Radiance.Color,1);
     // Load and unpack radiance data to reservoir
     uint2 RadianceDataPacked = asuint(H_LOAD(_ReservoirAtlasRadianceData, pixCoord.xy).xy);
     UnpackRadianceData(RadianceDataPacked, Diffuse, Reservoir.Radiance);
@@ -308,7 +313,9 @@ void ProbeAtlasSpatialReuse(uint3 pixCoord : SV_DispatchThreadID, uint2 groupThr
         // Merge with center reservoir
         ReservoirMergeSpatial(CellTapCoord, ReservoirSamplePacked, SampleWeights[i] * ShadowGuidanceWeight, Diffuse, Reservoir, ReservoirUpdateRandom);
     }
-    
+      _ReservoirAtlas_Output_Debug[H_COORD(pixCoord.xy)] = float4(Reservoir.Radiance.Color,1);
+    //   _ReservoirAtlas_Output_Debug[H_COORD(pixCoord.xy)] = float4(SampleWeights[0],SampleWeights[1],SampleWeights[2],1);
+
     // Recalculate W
     Reservoir.Radiance.W = Reservoir.Radiance.Wsum / max(Reservoir.Radiance.M * Luminance(Reservoir.Radiance.Color * Diffuse), 1e-7) ;
     
@@ -319,6 +326,8 @@ void ProbeAtlasSpatialReuse(uint3 pixCoord : SV_DispatchThreadID, uint2 groupThr
     // Output main and data reservoirs
     _ReservoirAtlasRadianceData_Output[H_COORD(pixCoord.xy)] = RadianceDataPacked;
     _ReservoirAtlasRayData_Output[H_COORD(pixCoord.xy)] = asuint(H_LOAD(_ReservoirAtlasRayData, Reservoir.MergedCoord).x);
+
+  
 }
 
 

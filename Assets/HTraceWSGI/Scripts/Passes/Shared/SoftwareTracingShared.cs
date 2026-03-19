@@ -257,9 +257,11 @@ namespace HTraceWSGI.Scripts.Passes.Shared
 		// SPATIAL PREPASS RT
 		internal static RTWrapper SpatialOffsetsPacked = new RTWrapper();
 		internal static RTWrapper SpatialWeightsPacked = new RTWrapper();
+		internal static RTWrapper SpatialWeightsPackedDebug = new RTWrapper();
 
 		// RESERVOIR RT
 		internal static RTWrapper ReservoirAtlas               = new RTWrapper();
+		internal static RTWrapper ReservoirAtlas_Debug               = new RTWrapper();
 		internal static RTWrapper ReservoirAtlas_History       = new RTWrapper();
 		internal static RTWrapper ReservoirAtlasRadianceData_A = new RTWrapper();
 		internal static RTWrapper ReservoirAtlasRadianceData_B = new RTWrapper();
@@ -290,6 +292,8 @@ namespace HTraceWSGI.Scripts.Passes.Shared
 
 		// DEBUG RT
 		internal static RTWrapper DebugOutput                     = new RTWrapper();
+
+        internal static RTWrapper CustomCameraMotionVectors = new RTWrapper();
 
 		internal static RTWrapper RadianceCacheFiltered = new RTWrapper();
 
@@ -365,7 +369,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
 
         internal static void Execute(CommandBuffer cmd, Camera camera, int cameraWidth, int cameraHeight, Texture cameraColorBuffer = null, Texture previousColorBuffer = null, Texture diffuseBuffer = null, RenderingData renderingData = default)
 		{
-
+            
             HFrameCount++;
             cmd.SetGlobalInt(HShaderParams.g_TestCheckbox, HSettings.DebugSettings.TestCheckbox ? 1 : 0);
             cmd.SetGlobalInt(HShaderParams.HFrameCount, HFrameCount);
@@ -405,7 +409,6 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetGlobalTexture(HShaderParams._RankingTileXSPP, HBlueNoiseShared.RankingTileXSPP);
                 cmd.SetGlobalTexture(HShaderParams._ScramblingTexture, HBlueNoiseShared.ScramblingTexture);
 
-                Debug.Log("BindDitheredTexture BlueNoise");
 
             }
 
@@ -512,7 +515,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 // Smooth geometry normals
                 cmd.SetComputeTextureParam(HSpatialPrepass, (int)HSpatialPrepassKernel.GeometryNormalsSmoothing, HShaderParams._ProbeNormalDepth,        ProbeNormalDepth_Intermediate.rt);
                 cmd.SetComputeTextureParam(HSpatialPrepass, (int)HSpatialPrepassKernel.GeometryNormalsSmoothing, HShaderParams._ProbeNormalDepth_Output, ProbeNormalDepth.rt);
-                cmd.DispatchCompute(HSpatialPrepass, (int)HSpatialPrepassKernel.GeometryNormalsSmoothing, probeResX_8, probeResY_8, HRenderer.TextureXrSlices);
+                cmd.DispatchCompute(HSpatialPrepass, (int)HSpatialPrepassKernel.GeometryNormalsSmoothing, probeResX_8, probeResY_8, 1);
             }
 
             // ---------------------------------------- PROBE TEMPORAL REPROJECTION ---------------------------------------- //
@@ -525,15 +528,20 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeTextureParam(HTemporalReprojection, (int)HTemporalReprojectionKernel.ProbeReprojection, HShaderParams._ReprojectionWeights_Output,           ReprojectionWeights.rt);
                 cmd.SetComputeTextureParam(HTemporalReprojection, (int)HTemporalReprojectionKernel.ProbeReprojection, HShaderParams._PersistentReprojectionWeights_Output, PersistentReprojectionWeights.rt);
                 cmd.SetComputeTextureParam(HTemporalReprojection, (int)HTemporalReprojectionKernel.ProbeReprojection, HShaderParams._PersistentReprojectionCoord_Output,   PersistentReprojectionCoord.rt);
-                cmd.DispatchCompute(HTemporalReprojection, (int)HTemporalReprojectionKernel.ProbeReprojection, probeResX_8, probeResY_8, HRenderer.TextureXrSlices);
+                cmd.DispatchCompute(HTemporalReprojection, (int)HTemporalReprojectionKernel.ProbeReprojection, probeResX_8, probeResY_8, 1);
+
+                  // Update probe world position & normal history buffer
+                cmd.SetComputeTextureParam(HTemporalReprojection, (int)HTemporalReprojectionKernel.HistoryProbeBuffersUpdate, HShaderParams._ProbeNormalDepth, ProbeNormalDepth.rt);
+                cmd.SetComputeTextureParam(HTemporalReprojection, (int)HTemporalReprojectionKernel.HistoryProbeBuffersUpdate, HShaderParams._ProbeWorldPosNormal_HistoryOutput, ProbeWorldPosNormal_History.rt);
+                cmd.DispatchCompute(HTemporalReprojection, (int)HTemporalReprojectionKernel.HistoryProbeBuffersUpdate, probeResX_8, probeResY_8, 1);
+
+
             }
 
 
-            // Update probe world position & normal history buffer
-            cmd.SetComputeTextureParam(HTemporalReprojection, (int)HTemporalReprojectionKernel.HistoryProbeBuffersUpdate, HShaderParams._ProbeNormalDepth, ProbeNormalDepth.rt);
-            cmd.SetComputeTextureParam(HTemporalReprojection, (int)HTemporalReprojectionKernel.HistoryProbeBuffersUpdate, HShaderParams._ProbeWorldPosNormal_HistoryOutput, ProbeWorldPosNormal_History.rt);
-            cmd.DispatchCompute(HTemporalReprojection, (int)HTemporalReprojectionKernel.HistoryProbeBuffersUpdate, probeResX_8, probeResY_8, HRenderer.TextureXrSlices);
 
+
+          
 
             // ---------------------------------------- RAY GENERATION ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_RayGenerationProfilingSampler))
@@ -546,28 +554,28 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.RayGeneration, HShaderParams._IndirectCoordsOV_Output, IndirectCoordsOV.ComputeBuffer);
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.RayGeneration, HShaderParams._IndirectCoordsSF_Output, IndirectCoordsSF.ComputeBuffer);
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.RayGeneration, HShaderParams._RayCounter_Output,       RayCounter);
-                cmd.DispatchCompute(HRayGeneration, (int)HRayGenerationKernel.RayGeneration, probeAtlasResX_8, probeAtlasResY_8, HRenderer.TextureXrSlices);
+                cmd.DispatchCompute(HRayGeneration, (int)HRayGenerationKernel.RayGeneration, probeAtlasResX_8, probeAtlasResY_8, 1);
                 
                 // Prepare arguments for screen space indirect dispatch
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, HShaderParams._RayCounter,               RayCounter);
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, HShaderParams._TracingCoords,            IndirectCoordsSS.ComputeBuffer);
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, HShaderParams._IndirectArguments_Output, IndirectArgumentsSS);
                 cmd.SetComputeIntParam(HRayGeneration, HShaderParams._RayCounterIndex, 0);
-                cmd.DispatchCompute(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, 1, 1, HRenderer.TextureXrSlices);
+                cmd.DispatchCompute(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, 1, 1, 1);
                 
                 // Prepare arguments for occlusion validation indirect dispatch
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, HShaderParams._RayCounter,               RayCounter);
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, HShaderParams._TracingCoords,            IndirectCoordsOV.ComputeBuffer);
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, HShaderParams._IndirectArguments_Output, IndirectArgumentsOV);
                 cmd.SetComputeIntParam(HRayGeneration, HShaderParams._RayCounterIndex, 1);
-                cmd.DispatchCompute(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, 1, 1, HRenderer.TextureXrSlices);
+                cmd.DispatchCompute(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, 1, 1, 1);
                 
                 // Prepare arguments for spatial filter indirect dispatch
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, HShaderParams._RayCounter,               RayCounter);
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, HShaderParams._TracingCoords,            IndirectCoordsSF.ComputeBuffer);
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, HShaderParams._IndirectArguments_Output, IndirectArgumentsSF);
                 cmd.SetComputeIntParam(HRayGeneration, HShaderParams._RayCounterIndex, 2);
-                cmd.DispatchCompute(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, 1, 1, HRenderer.TextureXrSlices);
+                cmd.DispatchCompute(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, 1, 1, 1);
             }
 
             // ---------------------------------------- CLEAR CHECKERBOARD TARGETS ---------------------------------------- //
@@ -631,11 +639,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.RayCompaction, HShaderParams._TracingCoords_Output,     IndirectCoordsWS.ComputeBuffer);
                 cmd.SetComputeIntParam(HRayGeneration, HShaderParams._IndexXR, 0);
                 cmd.DispatchCompute(HRayGeneration, (int)HRayGenerationKernel.RayCompaction, IndirectArgumentsSS, 0);
-                if (HRenderer.TextureXrSlices > 1)
-                {
-                    cmd.SetComputeIntParam(HRayGeneration, HShaderParams._IndexXR, 1);
-                    cmd.DispatchCompute(HRayGeneration, (int)HRayGenerationKernel.RayCompaction, IndirectArgumentsSS, sizeof(uint) * 3);
-                }
+
 
                 // Prepare indirect arguments for world space lighting
                 cmd.SetComputeBufferParam(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, HShaderParams._RayCounter,               RayCounterWS);
@@ -644,8 +648,6 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeIntParam(HRayGeneration, HShaderParams._RayCounterIndex, 0);
                 cmd.DispatchCompute(HRayGeneration, (int)HRayGenerationKernel.IndirectArguments, 1, 1, HRenderer.TextureXrSlices);
             }
-            
-     
         
             // // TDR timeout protection
             // if (SkipFirstFrame 
@@ -682,11 +684,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                     cmd.SetComputeFloatParam(HTracingWorldSpace, HShaderParams._RayLength, HSettings.GeneralSettings.RayLength);
                     cmd.SetComputeIntParam(HTracingWorldSpace, HShaderParams._IndexXR, 0);
                     cmd.DispatchCompute(HTracingWorldSpace, (int)HTracingWorldSpaceKernel.WorldSpaceTracing, IndirectArgumentsWS, 0);
-                    if (HRenderer.TextureXrSlices > 1)
-                    {
-                        cmd.SetComputeIntParam(HTracingWorldSpace, HShaderParams._IndexXR, 1);
-                        cmd.DispatchCompute(HTracingWorldSpace, (int)HTracingWorldSpaceKernel.WorldSpaceTracing, IndirectArgumentsWS, sizeof(uint) * 3);
-                    }
+
                 }
                 
                 // Evaluate world-space lighting
@@ -699,17 +697,9 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                     cmd.SetComputeBufferParam(HTracingWorldSpace, (int)HTracingWorldSpaceKernel.LightEvaluation, HShaderParams._RayCounter,    RayCounterWS);
                     cmd.SetComputeIntParam(HTracingWorldSpace, HShaderParams._IndexXR, 0);
                     cmd.DispatchCompute(HTracingWorldSpace, (int)HTracingWorldSpaceKernel.LightEvaluation, IndirectArgumentsWS, 0);
-                    if (HRenderer.TextureXrSlices > 1)
-                    {
-                        cmd.SetComputeIntParam(HTracingWorldSpace, HShaderParams._IndexXR, 1);
-                        cmd.DispatchCompute(HTracingWorldSpace, (int)HTracingWorldSpaceKernel.LightEvaluation, IndirectArgumentsWS, sizeof(uint) * 3);
-                    }
+
                 }
             } 
-
-            //             cmd.Blit(HitRadiance.rt, RadianceAccumulated.rt);
-            //   cmd.SetGlobalTexture(HShaderParams.g_HTraceBufferGI, RadianceAccumulated.rt);
-            // return;
 
             // ---------------------------------------- RADIANCE CACHING ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_RadianceCachingProfilingSampler))
@@ -736,7 +726,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                         cmd.SetComputeTextureParam(HRadianceCache, (int)HRadianceCacheKernel.CachePrimarySpawn, HShaderParams._ProbeNormalDepth, ProbeNormalDepth.rt);
                         cmd.SetComputeTextureParam(HRadianceCache, (int)HRadianceCacheKernel.CachePrimarySpawn, HShaderParams._GeometryNormal, GeometryNormal.rt);
                         cmd.SetComputeTextureParam(HRadianceCache, (int)HRadianceCacheKernel.CachePrimarySpawn, HShaderParams._RadianceAtlas, HitRadiance.rt);
-                        cmd.DispatchCompute(HRadianceCache, (int)HRadianceCacheKernel.CachePrimarySpawn, probeResX_8, probeResY_8, HRenderer.TextureXrSlices);
+                        cmd.DispatchCompute(HRadianceCache, (int)HRadianceCacheKernel.CachePrimarySpawn, probeResX_8, probeResY_8, 1);
                     }
 
                     // Cache tracing update
@@ -752,16 +742,6 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                         cmd.DispatchCompute(HRadianceCache, (int)HRadianceCacheKernel.CacheLightEvaluation, (HConstants.HASH_STORAGE_SIZE / HConstants.HASH_UPDATE_FRACTION) / 64, 1, 1); 
                     }
 
-                    //// Cache writing at primary surfaces
-                    //using (new HTraceProfilingScope(cmd, s_PrimaryCacheSpawnProfilingSampler))
-                    //{  
-                    //    cmd.SetComputeTextureParam(HRadianceCache, (int)HRadianceCacheKernel.CachePrimarySpawn, HShaderParams._ReprojectionCoords, ReprojectionCoord.rt);
-                    //    cmd.SetComputeTextureParam(HRadianceCache, (int)HRadianceCacheKernel.CachePrimarySpawn, HShaderParams._ProbeNormalDepth,   ProbeNormalDepth.rt);
-                    //    cmd.SetComputeTextureParam(HRadianceCache, (int)HRadianceCacheKernel.CachePrimarySpawn, HShaderParams._GeometryNormal,     GeometryNormal.rt);
-                    //    cmd.SetComputeTextureParam(HRadianceCache, (int)HRadianceCacheKernel.CachePrimarySpawn, HShaderParams._RadianceAtlas,      HitRadiance.rt);
-                    //    cmd.DispatchCompute(HRadianceCache, (int)HRadianceCacheKernel.CachePrimarySpawn, probeResX_8, probeResY_8, HRenderer.TextureXrSlices);
-                    //}
-
                     // Cache counter update, deallocation of out-of-bounds entries, filtered cache population
                     using (new HTraceProfilingScope(cmd, s_CacheDataUpdateProfilingSampler))
                     {   
@@ -773,7 +753,6 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 }
                 
             }
-
 
  
             // ---------------------------------------- SPATIAL PREPASS ---------------------------------------- //
@@ -795,6 +774,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeTextureParam(HSpatialPrepass, (int)HSpatialPrepassKernel.SpatialPrepass, HShaderParams._ProbeNormalDepth_History, ProbeNormalDepth_History.rt);
                 cmd.SetComputeTextureParam(HSpatialPrepass, (int)HSpatialPrepassKernel.SpatialPrepass, HShaderParams._SpatialOffsets_Output,    SpatialOffsetsPacked.rt);
                 cmd.SetComputeTextureParam(HSpatialPrepass, (int)HSpatialPrepassKernel.SpatialPrepass, HShaderParams._SpatialWeights_Output,    SpatialWeightsPacked.rt);
+                cmd.SetComputeTextureParam(HSpatialPrepass, (int)HSpatialPrepassKernel.SpatialPrepass, HShaderParams._SpatialWeights_Output_Debug,    SpatialWeightsPackedDebug.rt);
                 cmd.SetComputeBufferParam(HSpatialPrepass, (int)HSpatialPrepassKernel.SpatialPrepass, HShaderParams._PointDistribution,    PointDistributionBuffer);
                 cmd.SetComputeBufferParam(HSpatialPrepass, (int)HSpatialPrepassKernel.SpatialPrepass, HShaderParams._SpatialOffsetsBuffer, SpatialOffsetsBuffer);
                 cmd.DispatchCompute(HSpatialPrepass, (int)HSpatialPrepassKernel.SpatialPrepass, probeResX_8, probeResY_8, 1);
@@ -804,10 +784,12 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeTextureParam(HProbeAmbientOcclusion, (int)HProbeAmbientOcclusionKernel.ProbeAmbientOcclusionSpatialFilter, HShaderParams._SpatialOffsetsPacked,                 SpatialOffsetsPacked.rt);
                 cmd.SetComputeTextureParam(HProbeAmbientOcclusion, (int)HProbeAmbientOcclusionKernel.ProbeAmbientOcclusionSpatialFilter, HShaderParams._ProbeAmbientOcclusion,                ProbeAmbientOcclusion.rt);
                 cmd.SetComputeTextureParam(HProbeAmbientOcclusion, (int)HProbeAmbientOcclusionKernel.ProbeAmbientOcclusionSpatialFilter, HShaderParams._ProbeAmbientOcclusion_OutputFiltered, ProbeAmbientOcclusion_Filtered.rt);
-                cmd.DispatchCompute(HProbeAmbientOcclusion, (int)HProbeAmbientOcclusionKernel.ProbeAmbientOcclusionSpatialFilter, probeResX_8, probeResY_8, HRenderer.TextureXrSlices);
+                cmd.DispatchCompute(HProbeAmbientOcclusion, (int)HProbeAmbientOcclusionKernel.ProbeAmbientOcclusionSpatialFilter, probeResX_8, probeResY_8, 1);
             }
       
    
+           
+
 
             // ---------------------------------------- ReSTIR TEMPORAL REUSE ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_ReSTIRTemporalReuseProfilingSampler))
@@ -821,14 +803,17 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasTemporalReuse, HShaderParams._ReprojectionWeights, PersistentReprojectionWeights.rt);
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasTemporalReuse, HShaderParams._PersistentReprojectionCoord, PersistentReprojectionCoord.rt);
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasTemporalReuse, HShaderParams._ReservoirAtlas_Output, ReservoirAtlas.rt);
+                cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasTemporalReuse, HShaderParams._ReservoirAtlas_Output_Debug, ReservoirAtlas_Debug.rt);
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasTemporalReuse, HShaderParams._ReservoirAtlas_History, ReservoirAtlas_History.rt);
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasTemporalReuse, HShaderParams._ReservoirAtlasRayData_Output, ReservoirAtlasRayData_A.rt);
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasTemporalReuse, HShaderParams._ReservoirAtlasRadianceData_Output, ReservoirAtlasRadianceData_A.rt);
                 cmd.SetComputeIntParam(HReSTIR, HShaderParams._UseDiffuseWeight, HSettings.GeneralSettings.DebugModeWS == DebugModeWS.None ? 1 : 0);
                 cmd.DispatchCompute(HReSTIR, (int)HReSTIRKernel.ProbeAtlasTemporalReuse, probeAtlasResX_8, probeAtlasResY_8, 1);
             }
-            
-          
+
+
+
+        
             // ---------------------------------------- RESERVOIR OCCLUSION VALIDATION ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_ReservoirOcclusionValidationProfilingSampler))
             {
@@ -886,7 +871,6 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeTextureParam(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, HShaderParams._ReservoirAtlasRadianceData_Inout, ReservoirAtlasRadianceData_A.rt);
                 cmd.DispatchCompute(HReservoirValidation, (int)HReservoirValidationKernel.OcclusionSpatialFilter, probeAtlasResX_8, probeAtlasResY_8, HRenderer.TextureXrSlices);
             }
-                        
   
             // ---------------------------------------- ReSTIR SPATIAL REUSE ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_ReSTIRSpatialReuseProfilingSampler))
@@ -895,6 +879,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasSpatialReuse, HShaderParams._ProbeDiffuse,         ProbeDiffuse.rt);
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasSpatialReuse, HShaderParams._SpatialWeightsPacked, SpatialWeightsPacked.rt);
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasSpatialReuse, HShaderParams._SpatialOffsetsPacked, SpatialOffsetsPacked.rt);
+                cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasSpatialReuse, HShaderParams._ReservoirAtlas_Output_Debug, ReservoirAtlas_Debug.rt);
                 
                 // 1st spatial disk pass
                 cmd.SetComputeIntParam(HReSTIR, HShaderParams._PassNumber, 1);
@@ -928,8 +913,12 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasSpatialReuse, HShaderParams._ReservoirAtlasRadianceData_Output, ReservoirAtlasRadianceData_A.rt);
                 cmd.DispatchCompute(HReSTIR, (int)HReSTIRKernel.ProbeAtlasSpatialReuse, probeAtlasResX_8, probeAtlasResY_8, 1);
             }   
-            
-         
+                            
+            // cmd.Blit(ReservoirAtlas_Debug.rt, RadianceAccumulated.rt);
+            // cmd.Blit(ReservoirAtlas_Debug.rt, RadianceAccumulated.rt);
+            // cmd.SetGlobalTexture(HShaderParams.g_HTraceBufferGI, RadianceAccumulated.rt);
+            // return;
+
             // ---------------------------------------- PERSISTENT HISTORY UPDATE ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_PersistentHistoryUpdateProfilingSampler))
             {   
@@ -963,7 +952,10 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ReservoirHistoryUpdate, HShaderParams._ReservoirAtlas_ArrayOutput, ReservoirAtlas_History.rt);
                 cmd.DispatchCompute(HReSTIR, (int)HReSTIRKernel.ReservoirHistoryUpdate, probeAtlasResX_8, probeAtlasResY_8, 1);
             }
-            
+
+
+
+
             // ---------------------------------------- INTERPOLATION ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_InterpolationProfilingSampler))
             {   
@@ -989,7 +981,6 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.DispatchCompute(HInterpolation, (int)HInterpolationKernel.Interpolation, fullResX_8, fullResY_8, 1);
             }
 
-            
             // ---------------------------------------- TEMPORAL DENOISER ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_TemporalDenoisingProfilingSampler))
             {
@@ -1003,8 +994,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.DispatchCompute(HTemporalDenoiser, (int)HTemporalDenoiserKernel.TemporalDenoising, fullResX_8, fullResY_8, 1);
             }
 
-           
-                
+
             // ---------------------------------------- SPATIAL CLEANUP ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_SpatialCleanupProfilingSampler))
             {
@@ -1015,6 +1005,8 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.DispatchCompute(HTemporalDenoiser, (int)HTemporalDenoiserKernel.SpatialCleanup, fullResX_8, fullResY_8, 1);
             }
     
+
+            
             
              // ---------------------------------------- COPY BUFFERS ---------------------------------------- //
             using (new HTraceProfilingScope(cmd, s_CopyBuffersProfilingSampler))
@@ -1037,7 +1029,8 @@ namespace HTraceWSGI.Scripts.Passes.Shared
            
             // Final output
             cmd.SetGlobalTexture(HShaderParams.g_HTraceBufferGI, RadianceAccumulated.rt);
-            
+                                                                    //  cmd.Blit(Radiance_Interpolated.rt, RadianceAccumulated.rt);
+   
                      
             
             // ---------------------------------------- DEBUG (DON'T SHIP!) ---------------------------------------- //

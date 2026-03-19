@@ -142,14 +142,6 @@ namespace UnityEngine.Rendering.Universal
 
         internal static void SetCameraMatrices(CommandBuffer cmd, ref CameraData cameraData, bool setInverseMatrices, bool isTargetFlipped)
         {
-#if ENABLE_VR && ENABLE_XR_MODULE
-            if (cameraData.xr.enabled)
-            {
-                cameraData.PushBuiltinShaderConstantsXR(cmd, false);
-                XRSystemUniversal.MarkShaderProperties(cmd, cameraData.xrUniversal, false);
-                return;
-            }
-#endif
 
             // NOTE: the URP default main view/projection matrices are the CameraData view/projection matrices.
             Matrix4x4 viewMatrix = cameraData.GetViewMatrix();
@@ -161,7 +153,8 @@ namespace UnityEngine.Rendering.Universal
 
             // Set the default view/projection, note: projectionMatrix will be set as a gpu-projection (gfx api adjusted) for rendering.
             cmd.SetViewProjectionMatrices(viewMatrix, projectionMatrix);
-
+            Debug.Log("SetCameraMatrices---------------------");
+                        
             if (setInverseMatrices)
             {
                 Matrix4x4 gpuProjectionMatrix = cameraData.GetGPUProjectionMatrix(isTargetFlipped);

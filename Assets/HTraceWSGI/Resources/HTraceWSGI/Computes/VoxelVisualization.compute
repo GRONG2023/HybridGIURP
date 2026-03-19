@@ -87,6 +87,6 @@ void VisualizeVoxels(uint3 pixCoord : SV_DispatchThreadID)
 	{
 		_Visualization_Output[H_COORD(pixCoord.xy)] = EvaluateSky(RayDirection) * HGetCurrentExposureMultiplier;
 	}
-	_Visualization_Output[H_COORD(pixCoord.xy)] = float3(Payload.HitDistance*0.01,0,0);
+	// _Visualization_Output[H_COORD(pixCoord.xy)] = float3(Payload.HitDistance*0.01,0,0);
 	// _Visualization_Output[H_COORD(pixCoord.xy)] = float3(Payload.HitPosition);
 }

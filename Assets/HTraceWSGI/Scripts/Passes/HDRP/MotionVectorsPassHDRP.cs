@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using HTraceWSGI.Scripts.Passes.Shared;
 
 namespace HTraceWSGI.Scripts.Passes.HDRP
 {
@@ -26,14 +27,14 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
         internal static Material CameraMotionVectorsMaterial_HDRP;
 
         // Textures
-        internal static RTWrapper CustomCameraMotionVectors = new RTWrapper();
+        // internal static RTWrapper CustomCameraMotionVectors = new RTWrapper();
 
         private bool _initialized = false;
 
         public MotionVectorsPassHDRP()
         {
             renderPassEvent = RenderPassEvent.AfterRenderingGbuffer+2;
-            //// ÇëÇóMotionVectors Buffer
+            //// ï¿½ï¿½ï¿½ï¿½MotionVectors Buffer
             //ConfigureInput(ScriptableRenderPassInput.Motion | ScriptableRenderPassInput.Depth);
         }
 
@@ -41,16 +42,24 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
         {
             if (!_initialized)
             {
-                // URPÖÐÃ»ÓÐHDRPµÄCameraMotionVectors shader£¬ÓÃURP×Ô¼ºµÄ
+                // URPï¿½ï¿½Ã»ï¿½ï¿½HDRPï¿½ï¿½CameraMotionVectors shaderï¿½ï¿½ï¿½ï¿½URPï¿½Ô¼ï¿½ï¿½ï¿½
                 if (CameraMotionVectorsMaterial_HDRP == null)
                     CameraMotionVectorsMaterial_HDRP = CoreUtils.CreateEngineMaterial(Shader.Find("Hidden/Universal Render Pipeline/CameraMotionVectors"));
 
-                CustomCameraMotionVectors?.HRelease();
-                CustomCameraMotionVectors.HTextureAlloc("_CustomCameraMotionVectors", Vector2.one, GraphicsFormat.R16G16_SFloat);
+                SoftwareTracingShared.CustomCameraMotionVectors?.HRelease();
+                SoftwareTracingShared.CustomCameraMotionVectors.HTextureAlloc("_CustomCameraMotionVectors", Vector2.one, GraphicsFormat.R16G16_SFloat);
 
                 _initialized = true;
             }
         }
+
+        Matrix4x4 _NonJitteredViewProjMatrix;
+        Matrix4x4 _PrevViewProjMatrix;
+
+        public Matrix4x4 prevInvViewProjMatrix;
+		
+		Vector3 prevWorldSpaceCameraPos;
+        bool isFirst = true;
 
         public override void Execute(ScriptableRenderContext renderContext, ref RenderingData renderingData)
         {
@@ -61,6 +70,73 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
                 return;
 
             var cmd = CommandBufferPool.Get(HNames.HTRACE_MV_PASS_NAME);
+
+		    // Matrix4x4 currentViewMatrix = camera.worldToCameraMatrix;
+            // // Debug.Log("currentViewMatrix = "+currentViewMatrix);
+			// currentViewMatrix.SetColumn(3, new Vector4(0, 0, 0, 1));
+            // // Debug.Log("currentViewMatrix2 = "+currentViewMatrix);
+			// Matrix4x4 currentProjMatrix = GL.GetGPUProjectionMatrix(camera.nonJitteredProjectionMatrix, true); // Had to change this from 'false'
+
+            // _NonJitteredViewProjMatrix = currentProjMatrix * currentViewMatrix;
+            // cmd.SetGlobalMatrix(HShaderParams._NonJitteredViewProjMatrix, _NonJitteredViewProjMatrix);
+
+            // if (isFirst)
+            // {
+            //     _PrevViewProjMatrix = _NonJitteredViewProjMatrix;
+            //     isFirst = false;
+            // }
+            // cmd.SetGlobalMatrix(HShaderParams._PrevViewProjMatrix, _PrevViewProjMatrix);
+            // _PrevViewProjMatrix = _NonJitteredViewProjMatrix;
+
+
+            Matrix4x4 currentViewMatrix = camera.worldToCameraMatrix;
+            // Debug.Log("currentViewMatrix = "+currentViewMatrix);
+			currentViewMatrix.SetColumn(3, new Vector4(0, 0, 0, 1));
+            // Debug.Log("currentViewMatrix2 = "+currentViewMatrix);
+			Matrix4x4 currentProjMatrix = GL.GetGPUProjectionMatrix(camera.nonJitteredProjectionMatrix, true); // Had to change this from 'false'
+
+			Vector3 cameraPosition = camera.transform.position;
+
+            _NonJitteredViewProjMatrix = currentProjMatrix * currentViewMatrix;
+   
+            cmd.SetGlobalMatrix(HShaderParams._NonJitteredViewProjMatrix, _NonJitteredViewProjMatrix);
+            cmd.SetGlobalMatrix(HShaderParams._NonJitteredViewProjMatrix2, _NonJitteredViewProjMatrix);
+            cmd.SetGlobalMatrix(HShaderParams._ViewMatrix2, currentViewMatrix);
+            cmd.SetGlobalMatrix(HShaderParams._ViewProjMatrix2, _NonJitteredViewProjMatrix);
+
+            Matrix4x4 _InvViewMatrix = currentViewMatrix.inverse;
+            cmd.SetGlobalMatrix(HShaderParams._InvViewMatrix2, _InvViewMatrix);
+
+ 			// cmd.SetGlobalMatrix(HShaderParams.unity_MatrixV2, currentViewMatrix);
+ 			cmd.SetGlobalMatrix(HShaderParams.unity_MatrixInvV2, _InvViewMatrix);
+ 			// cmd.SetGlobalMatrix(HShaderParams.unity_MatrixVP2, _NonJitteredViewProjMatrix);
+
+
+            if (isFirst)
+            {
+				prevWorldSpaceCameraPos = cameraPosition;
+                _PrevViewProjMatrix = _NonJitteredViewProjMatrix;
+                isFirst = false;
+            }
+
+			Vector3 cameraDisplacement = cameraPosition - prevWorldSpaceCameraPos;
+
+			_PrevViewProjMatrix *= Matrix4x4.Translate(cameraDisplacement);
+			prevInvViewProjMatrix = _PrevViewProjMatrix.inverse;
+			
+            cmd.SetGlobalMatrix(HShaderParams._PrevViewProjMatrix, _PrevViewProjMatrix);
+            cmd.SetGlobalMatrix(HShaderParams._PrevViewProjMatrix2, _PrevViewProjMatrix);
+            
+
+            Matrix4x4 _NonJitteredViewProjMatrixInverse = _NonJitteredViewProjMatrix.inverse;
+			cmd.SetGlobalMatrix(HShaderParams._InvViewProjMatrix2, _NonJitteredViewProjMatrixInverse);
+ 			cmd.SetGlobalMatrix(HShaderParams._PrevInvViewProjMatrix2, prevInvViewProjMatrix);
+ 			cmd.SetGlobalMatrix(HShaderParams.unity_MatrixInvVP2, _NonJitteredViewProjMatrixInverse);
+
+
+			_PrevViewProjMatrix = _NonJitteredViewProjMatrix;
+
+			prevWorldSpaceCameraPos = cameraPosition;
 
             try
             {
@@ -87,22 +163,28 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
                 //CameraMotionVectorsMaterial_HDRP.SetInt(StencilRef, 32);
                 //CameraMotionVectorsMaterial_HDRP.SetInt(StencilMask, 32);
 
-                //// ¿½±´MotionVectorsµ½×Ô¶¨ÒåRT
+                //// ï¿½ï¿½ï¿½ï¿½MotionVectorsï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½RT
                 //Blitter.BlitCameraTexture(cmd, cameraMotionVectorsBuffer, CustomCameraMotionVectors.rt);
 
-                // µþ¼ÓCamera MotionVectors£¨±³¾°²¿·Ö£©
-                cmd.Blit(renderer.cameraDepthTargetHandle, CustomCameraMotionVectors.rt, CameraMotionVectorsMaterial_HDRP, 0);
+                // ï¿½ï¿½ï¿½ï¿½Camera MotionVectorsï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö£ï¿½
+                // cmd.Blit(renderer.cameraDepthTargetHandle, CustomCameraMotionVectors.rt, CameraMotionVectorsMaterial_HDRP, 0);
                 //CoreUtils.SetRenderTarget(cmd, CustomCameraMotionVectors.rt, ClearFlag.Color);
                 //CoreUtils.DrawFullScreen(cmd, CameraMotionVectorsMaterial_HDRP, CustomCameraMotionVectors.rt, renderer.cameraDepthTargetHandle, shaderPassId: 0);
 
-                cmd.SetGlobalTexture(HShaderParams.g_HTraceMotionVectors, CustomCameraMotionVectors.rt);
+                
+                
+                CoreUtils.SetRenderTarget(cmd, SoftwareTracingShared.CustomCameraMotionVectors.rt, ClearFlag.Color);
+				CoreUtils.DrawFullScreen(cmd, CameraMotionVectorsMaterial_HDRP, SoftwareTracingShared.CustomCameraMotionVectors.rt, renderer.cameraDepthTargetHandle, shaderPassId: 0);
+
+
+                cmd.SetGlobalTexture(HShaderParams.g_HTraceMotionVectors, SoftwareTracingShared.CustomCameraMotionVectors.rt);
             }
         }
 
         public void Cleanup()
         {
 
-            CustomCameraMotionVectors?.HRelease();
+            SoftwareTracingShared.CustomCameraMotionVectors?.HRelease();
             _initialized = false;
         }
     }

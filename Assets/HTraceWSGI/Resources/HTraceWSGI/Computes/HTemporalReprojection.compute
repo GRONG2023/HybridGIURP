@@ -100,6 +100,7 @@ void ProbeReprojection(int3 pixCoord : SV_DispatchThreadID, uint2 groupThreadID 
 
     // Output reprojection coords and weights and coords for N-1 frame
     _ReprojectionWeights_Output[H_COORD(pixCoord.xy)] = ReprojectionWeights;
+    // _ReprojectionWeights_Output[H_COORD(pixCoord.xy)] = float4(-H_MATRIX_V._m03_m13_m23,1);
     _ReprojectionCoords_Output[H_COORD(pixCoord.xy)] = PackReprojectionCoord(ReprojectionCoord, BestReprojectionOffset, ReprojectionFailed);
     
     uint MaxHistoryFrames = DISABLE_PROBE_JITTER ? 1 : _PersistentHistorySamples;

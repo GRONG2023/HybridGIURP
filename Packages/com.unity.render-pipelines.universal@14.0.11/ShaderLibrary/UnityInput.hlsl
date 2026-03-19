@@ -212,10 +212,14 @@ real4  unity_FogColor;
 #if !defined(USING_STEREO_MATRICES)
 float4x4 glstate_matrix_projection;
 float4x4 unity_MatrixV;
+float4x4 unity_MatrixV2;
 float4x4 unity_MatrixInvV;
+float4x4 unity_MatrixInvV2;
 float4x4 unity_MatrixInvP;
 float4x4 unity_MatrixVP;
+float4x4 unity_MatrixVP2;
 float4x4 unity_MatrixInvVP;
+float4x4 unity_MatrixInvVP2;
 float4 unity_StereoScaleOffset;
 int unity_StereoEyeIndex;
 #endif

@@ -125,6 +125,8 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="setInverseMatrices">Set this to true if you also need to set inverse camera matrices.</param>
         public static void SetViewAndProjectionMatrices(CommandBuffer cmd, Matrix4x4 viewMatrix, Matrix4x4 projectionMatrix, bool setInverseMatrices)
         {
+            Debug.Log("SetViewAndProjectionMatrices ------------");
+
             Matrix4x4 viewAndProjectionMatrix = projectionMatrix * viewMatrix;
             cmd.SetGlobalMatrix(ShaderPropertyId.viewMatrix, viewMatrix);
             cmd.SetGlobalMatrix(ShaderPropertyId.projectionMatrix, projectionMatrix);

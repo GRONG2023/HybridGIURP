@@ -52,6 +52,7 @@ void CachePrimarySpawn(uint3 pixCoord : SV_DispatchThreadID)
     float2 Jitter;
     Jitter.x = GetBNDSequenceSample(pixCoord.xy, uint(_HFrameCount) % 36, 3);
     Jitter.y = GetBNDSequenceSample(pixCoord.xy, uint(_HFrameCount) % 36, 4);
+    Jitter = float2(0,0);
     float2 PixelJitter = Jitter.xy * float(_ProbeSize);
 
     uint2 ProbeOffset;
@@ -200,7 +201,7 @@ void CacheTracingUpdate(uint dispatchThreadId : SV_DispatchThreadID)
     float2 RayJitter;
     RayJitter.x = GetBNDSequenceSample(HitRandomCoord, _HFrameCount, 4);
     RayJitter.y = GetBNDSequenceSample(HitRandomCoord, _HFrameCount, 5);
-
+    RayJitter = float2(0,0);
     // Calculate hash cell tracing position
     uint4 HashPositionPacked = _HashBuffer_Position[dispatchThreadId.x].xyzw;
     float3 RayOrigin = asint(HashPositionPacked.xyz) * _VoxelSize;

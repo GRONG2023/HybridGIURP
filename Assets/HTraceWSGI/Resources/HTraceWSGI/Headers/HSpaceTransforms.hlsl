@@ -17,8 +17,6 @@ float3 H_GET_CAMERA_POSITION_WS()
 float3 H_GET_ABSOLUTE_POSITION_WS(float3 PositionWS)
 {
     return GetAbsolutePositionWS(PositionWS);
-
-
 }
 
 
@@ -26,6 +24,7 @@ float3 H_GET_ABSOLUTE_POSITION_WS(float3 PositionWS)
 float3 H_GET_RELATIVE_POSITION_WS(float3 PositionWS)
 {
     return GetCameraRelativePositionWS(PositionWS);
+    
 
 
 }
@@ -106,7 +105,8 @@ float3 H_TRANSFORM_WORLD_TO_VIEW_NORMAL(float3 NormalWS, bool Normalize = false)
 // --------------------------------- WORLD TO VIEW NOWMAL
 float4 H_TRANSFORM_WORLD_TO_H_CLIP(float3 positionWS)
 {
-    return TransformWorldToHClip(positionWS);
+    return mul(_ViewProjMatrix2,float4(positionWS, 1.0));
+    // return TransformWorldToHClip(positionWS);
 
     
 }

@@ -220,6 +220,7 @@ void TemporalDenoising(uint3 pixCoord : SV_DispatchThreadID, uint2 groupThreadID
     
     // Output radiance & samplecount
     _Radiance_Output[H_COORD(pixCoord.xy)] = float4(Radiance, SampleCount);
+
 }
 
 

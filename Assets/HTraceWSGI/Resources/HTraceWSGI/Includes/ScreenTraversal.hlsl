@@ -16,7 +16,7 @@ float AdaptiveThicknessSearch(float3 PositionWS, float3 RayDirectionWS)
     {
         // Move along the ray with fixed steps
         PositionWS += RayDirectionWS * StepSize;
-        float3 PositionNDC = H_COMPUTE_NDC_Z(PositionWS, UNITY_MATRIX_VP).xyz;
+        float3 PositionNDC = H_COMPUTE_NDC_Z(PositionWS, H_MATRIX_VP).xyz;
         
         if (all(PositionNDC.xy > 0) && all(PositionNDC.xy < 1))
         {
@@ -62,7 +62,7 @@ void GetRayOriginAndDirectionNDC(float Depth, float MaxDistance, float2 ProbeCoo
     }
 
     // Calculate ray start position in screen space
-    RayStartPositionNDC = H_COMPUTE_NDC_Z(PositionBiasedWS, UNITY_MATRIX_VP).xyz;
+    RayStartPositionNDC = H_COMPUTE_NDC_Z(PositionBiasedWS, H_MATRIX_VP).xyz;
 
     // Calculate ray end clipped position in screen space
     float3 RayEndPositionNDC;
@@ -70,11 +70,12 @@ void GetRayOriginAndDirectionNDC(float Depth, float MaxDistance, float2 ProbeCoo
         // Calculate clipped ray distance in world space
         float MaxRayDistanceWS = 100.0f;
         float3 RayDirectionVS = H_TRANSFORM_WORLD_TO_VIEW_DIR(-RayDirectionWS, true);
-        float SceneDepth = H_LINEAR_EYE_DEPTH(PositionBiasedWS, UNITY_MATRIX_V);
+        float SceneDepth = H_LINEAR_EYE_DEPTH(PositionBiasedWS, H_MATRIX_V);
         float RayClippedDistanceWS = RayDirectionVS.z < 0.0 ? min(-0.99f * SceneDepth / RayDirectionVS.z, MaxRayDistanceWS) : MaxRayDistanceWS;
 
         // Calculate ray end position in screen space
-        RayEndPositionNDC.xyz = H_COMPUTE_NDC_Z(PositionBiasedWS + RayDirectionWS * RayClippedDistanceWS, UNITY_MATRIX_VP).xyz;
+       
+        RayEndPositionNDC.xyz = H_COMPUTE_NDC_Z(PositionBiasedWS + RayDirectionWS * RayClippedDistanceWS, H_MATRIX_VP).xyz;
 
         // Recalculate ray end position where it leaves the screen
         float2 ScreenEdgeIntersections = LineBoxIntersect(RayStartPositionNDC, RayEndPositionNDC, 0, 1);

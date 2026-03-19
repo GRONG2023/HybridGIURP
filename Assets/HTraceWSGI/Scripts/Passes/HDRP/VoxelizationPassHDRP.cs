@@ -37,11 +37,11 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
                         VoxelizationShared.HVoxelization = HExtensions.LoadComputeShader("Voxelization");
                     if (VoxelizationShared.VoxelVisualization == null)
                         VoxelizationShared.VoxelVisualization = HExtensions.LoadComputeShader("VoxelVisualization");
-
+                    Allocation();
                     _initialized = true;
                 }
 
-                Allocation();
+               
             }
 
             internal static void Allocation(bool onlyRelease = false)
@@ -67,6 +67,7 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
                     //Debug
                     VoxelizationShared.VoxelVisualizationRayDirections.HRelease();
                     VoxelizationShared.DebugOutput.HRelease();
+
                 }
 
                 if (onlyRelease)
@@ -145,79 +146,81 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
             {
                 if (VoxelizationRuntimeData.VoxelCamera == null)
                     return;
-
+    
                 _FrameIndex++;
-                if (_FrameIndex % 4 != 0)
-                   return;
-
-                // Clear 3D textures
-                CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelData.rt, ClearFlag.Color, Color.clear, 0, CubemapFace.Unknown, -1);
-                CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionPyramid.rt, ClearFlag.Color, Color.clear, 0, CubemapFace.Unknown, -1);
-                CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionPyramid.rt, ClearFlag.Color, Color.clear, 1, CubemapFace.Unknown, -1);
-                CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionPyramid.rt, ClearFlag.Color, Color.clear, 2, CubemapFace.Unknown, -1);
-                CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionPyramid.rt, ClearFlag.Color, Color.clear, 3, CubemapFace.Unknown, -1);
-                CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionPyramid.rt, ClearFlag.Color, Color.clear, 4, CubemapFace.Unknown, -1);
-                CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionPyramid.rt, ClearFlag.Color, Color.clear, 5, CubemapFace.Unknown, -1);
-                CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionIntermediate.rt, ClearFlag.Color, Color.clear, 0, CubemapFace.Unknown, -1);
-
-                // Pass voxel camera pos to shaders
-                Debug.Log("CenterShiftTranslate2 VoxelizationRuntimeData.VoxelCamera.transform.position = "+VoxelizationRuntimeData.VoxelCamera.transform.position);
-                
-                cmd.SetGlobalVector(VoxelizationShared.g_VoxelCameraPos, VoxelizationRuntimeData.VoxelCamera.transform.position);
-
-                var voxelizationCamera = VoxelizationRuntimeData.VoxelCamera.Camera;
-
-                if (true)
+                bool shouldUpdateVoxels = (_FrameIndex % 4 == 0);
+           
+                if (shouldUpdateVoxels)
                 {
-                    cmd.SetGlobalVector(VoxelizationShared.g_VoxelResolution, (Vector3)HSettings.VoxelizationSettings.ExactData.Resolution);
-                    cmd.SetGlobalVector(VoxelizationShared.g_VoxelBounds, HSettings.VoxelizationSettings.ExactData.Bounds);
-                    cmd.SetGlobalFloat(VoxelizationShared.g_VoxelPerMeter, HSettings.VoxelizationSettings.ExactData.VoxelsPerMeter);
-                    cmd.SetGlobalFloat(VoxelizationShared.g_VoxelSize, HSettings.VoxelizationSettings.ExactData.VoxelSize);
+                    // Clear 3D textures
+                    CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelData.rt, ClearFlag.Color, Color.clear, 0, CubemapFace.Unknown, -1);
+                    CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionPyramid.rt, ClearFlag.Color, Color.clear, 0, CubemapFace.Unknown, -1);
+                    CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionPyramid.rt, ClearFlag.Color, Color.clear, 1, CubemapFace.Unknown, -1);
+                    CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionPyramid.rt, ClearFlag.Color, Color.clear, 2, CubemapFace.Unknown, -1);
+                    CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionPyramid.rt, ClearFlag.Color, Color.clear, 3, CubemapFace.Unknown, -1);
+                    CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionPyramid.rt, ClearFlag.Color, Color.clear, 4, CubemapFace.Unknown, -1);
+                    CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionPyramid.rt, ClearFlag.Color, Color.clear, 5, CubemapFace.Unknown, -1);
+                    CoreUtils.SetRenderTarget(cmd, VoxelizationShared.VoxelPositionIntermediate.rt, ClearFlag.Color, Color.clear, 0, CubemapFace.Unknown, -1);
 
-                    Vector3 BoundsSwizzled = new Vector3(HSettings.VoxelizationSettings.ExactData.Bounds.x, HSettings.VoxelizationSettings.ExactData.Bounds.z, HSettings.VoxelizationSettings.ExactData.Bounds.y);
-              
-                    Bounds voxelizationAABB = new Bounds(VoxelizationRuntimeData.VoxelCamera.transform.position, BoundsSwizzled);
-       
-                    cmd.SetGlobalVector(VoxelizationShared.g_VoxelizationAABB_Min, voxelizationAABB.min);
-                    cmd.SetGlobalVector(VoxelizationShared.g_VoxelizationAABB_Max, voxelizationAABB.max);
-                    // Debug.Log("voxelizationAABB = "+ voxelizationAABB.min +"  "+ voxelizationAABB.max);
-        
-                    if (voxelizationCamera.farClipPlane > 0)
+                    // Pass voxel camera pos to shaders
+                    // Debug.Log("CenterShiftTranslate2 VoxelizationRuntimeData.VoxelCamera.transform.position = "+VoxelizationRuntimeData.VoxelCamera.transform.position);
+                    
+                    cmd.SetGlobalVector(VoxelizationShared.g_VoxelCameraPos, VoxelizationRuntimeData.VoxelCamera.transform.position);
+
+                    var voxelizationCamera = VoxelizationRuntimeData.VoxelCamera.Camera;
+
+                    if (true)
                     {
-                        RenderVoxelsConstant(cmd, camera, cameraWidth, cameraHeight, renderContext, ref renderingData);
+                        cmd.SetGlobalVector(VoxelizationShared.g_VoxelResolution, (Vector3)HSettings.VoxelizationSettings.ExactData.Resolution);
+                        cmd.SetGlobalVector(VoxelizationShared.g_VoxelBounds, HSettings.VoxelizationSettings.ExactData.Bounds);
+                        cmd.SetGlobalFloat(VoxelizationShared.g_VoxelPerMeter, HSettings.VoxelizationSettings.ExactData.VoxelsPerMeter);
+                        cmd.SetGlobalFloat(VoxelizationShared.g_VoxelSize, HSettings.VoxelizationSettings.ExactData.VoxelSize);
+
+                        Vector3 BoundsSwizzled = new Vector3(HSettings.VoxelizationSettings.ExactData.Bounds.x, HSettings.VoxelizationSettings.ExactData.Bounds.z, HSettings.VoxelizationSettings.ExactData.Bounds.y);
+                  
+                        Bounds voxelizationAABB = new Bounds(VoxelizationRuntimeData.VoxelCamera.transform.position, BoundsSwizzled);
+           
+                        cmd.SetGlobalVector(VoxelizationShared.g_VoxelizationAABB_Min, voxelizationAABB.min);
+                        cmd.SetGlobalVector(VoxelizationShared.g_VoxelizationAABB_Max, voxelizationAABB.max);
+                        // Debug.Log("voxelizationAABB = "+ voxelizationAABB.min +"  "+ voxelizationAABB.max);
+            
+                        if (voxelizationCamera.farClipPlane > 0)
+                        {
+                            RenderVoxelsConstant(cmd, camera, cameraWidth, cameraHeight, renderContext, ref renderingData);
+                        }
                     }
-                }
 
-                // Generate mip pyramid for 3D position texture
-                using (new HTraceProfilingScope(cmd, VoxelizationShared.s_GeneratePositionPyramidProfilingSampler))
-                {
-                    // Generate 0-2 mip levels
-                    cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid1, VoxelizationShared.g_VoxelData, VoxelizationShared.VoxelData.rt);
-                    cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid1, VoxelizationShared._VoxelPositionPyramid_Mip0, VoxelizationShared.VoxelPositionPyramid.rt, 0);
-                    cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid1, VoxelizationShared._VoxelPositionPyramid_Mip1, VoxelizationShared.VoxelPositionPyramid.rt, 1);
-                    cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid1, VoxelizationShared._VoxelPositionPyramid_Mip2, VoxelizationShared.VoxelPositionPyramid.rt, 2);
-                    cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid1, VoxelizationShared._VoxelPositionIntermediate_Output, VoxelizationShared.VoxelPositionIntermediate.rt);
-                    cmd.DispatchCompute(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid1,
-                        Mathf.CeilToInt(HSettings.VoxelizationSettings.ExactData.Resolution.x / 8f),
-                        Mathf.CeilToInt(HSettings.VoxelizationSettings.ExactData.Resolution.z / 8f),
-                        Mathf.CeilToInt(HSettings.VoxelizationSettings.ExactData.Resolution.y / 8f));
+                    // Generate mip pyramid for 3D position texture
+                    using (new HTraceProfilingScope(cmd, VoxelizationShared.s_GeneratePositionPyramidProfilingSampler))
+                    {
+                        // Generate 0-2 mip levels
+                        cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid1, VoxelizationShared.g_VoxelData, VoxelizationShared.VoxelData.rt);
+                        cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid1, VoxelizationShared._VoxelPositionPyramid_Mip0, VoxelizationShared.VoxelPositionPyramid.rt, 0);
+                        cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid1, VoxelizationShared._VoxelPositionPyramid_Mip1, VoxelizationShared.VoxelPositionPyramid.rt, 1);
+                        cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid1, VoxelizationShared._VoxelPositionPyramid_Mip2, VoxelizationShared.VoxelPositionPyramid.rt, 2);
+                        cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid1, VoxelizationShared._VoxelPositionIntermediate_Output, VoxelizationShared.VoxelPositionIntermediate.rt);
+                        cmd.DispatchCompute(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid1,
+                            Mathf.CeilToInt(HSettings.VoxelizationSettings.ExactData.Resolution.x / 8f),
+                            Mathf.CeilToInt(HSettings.VoxelizationSettings.ExactData.Resolution.z / 8f),
+                            Mathf.CeilToInt(HSettings.VoxelizationSettings.ExactData.Resolution.y / 8f));
 
-                    // Generate 3-5 mip levels
-                    cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid2, VoxelizationShared._VoxelPositionIntermediate, VoxelizationShared.VoxelPositionIntermediate.rt);
-                    cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid2, VoxelizationShared._VoxelPositionPyramid_Mip3, VoxelizationShared.VoxelPositionPyramid.rt, 3);
-                    cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid2, VoxelizationShared._VoxelPositionPyramid_Mip4, VoxelizationShared.VoxelPositionPyramid.rt, 4);
-                    cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid2, VoxelizationShared._VoxelPositionPyramid_Mip5, VoxelizationShared.VoxelPositionPyramid.rt, 5);
-                    cmd.DispatchCompute(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid2,
-                        Mathf.CeilToInt(HSettings.VoxelizationSettings.ExactData.Resolution.x / 32f),
-                        Mathf.CeilToInt(HSettings.VoxelizationSettings.ExactData.Resolution.z / 32f),
-                        Mathf.CeilToInt(HSettings.VoxelizationSettings.ExactData.Resolution.y / 32f));
+                        // Generate 3-5 mip levels
+                        cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid2, VoxelizationShared._VoxelPositionIntermediate, VoxelizationShared.VoxelPositionIntermediate.rt);
+                        cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid2, VoxelizationShared._VoxelPositionPyramid_Mip3, VoxelizationShared.VoxelPositionPyramid.rt, 3);
+                        cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid2, VoxelizationShared._VoxelPositionPyramid_Mip4, VoxelizationShared.VoxelPositionPyramid.rt, 4);
+                        cmd.SetComputeTextureParam(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid2, VoxelizationShared._VoxelPositionPyramid_Mip5, VoxelizationShared.VoxelPositionPyramid.rt, 5);
+                        cmd.DispatchCompute(VoxelizationShared.HVoxelization, (int)VoxelizationShared.HVoxelizationKernel.GeneratePositionPyramid2,
+                            Mathf.CeilToInt(HSettings.VoxelizationSettings.ExactData.Resolution.x / 32f),
+                            Mathf.CeilToInt(HSettings.VoxelizationSettings.ExactData.Resolution.z / 32f),
+                            Mathf.CeilToInt(HSettings.VoxelizationSettings.ExactData.Resolution.y / 32f));
+                    }
                 }
 
                 // Pass voxelized textures to shaders in the Main Pass
                 cmd.SetGlobalTexture(VoxelizationShared.g_VoxelPositionPyramid, VoxelizationShared.VoxelPositionPyramid.rt);
                 cmd.SetGlobalTexture(VoxelizationShared.g_VoxelData, VoxelizationShared.VoxelData.rt);
 
-            VoxelizationRuntimeData.FullVoxelization = false;
+                VoxelizationRuntimeData.FullVoxelization = false;
             }
 
 
@@ -333,6 +336,7 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
 
             internal static void VisualizeVoxels(CommandBuffer cmd, Camera camera, int cameraWidth, int cameraHeight, ScriptableRenderContext renderContext)
             {
+        
                 VoxelizationShared.VoxelVisualization.EnableKeyword(VoxelizationShared.VISUALIZE_OFF);
                 VoxelizationShared.VoxelVisualization.DisableKeyword(VoxelizationShared.VISUALIZE_LIGHTING);
                 VoxelizationShared.VoxelVisualization.DisableKeyword(VoxelizationShared.VISUALIZE_COLOR);
@@ -368,6 +372,7 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
 
                         var debugCameraFrustum = HMath.ComputeFrustumCorners(camera);
                         // Debug.Log("debugCameraFrustum = "+debugCameraFrustum);
+
                         VoxelizationShared.VoxelVisualizationMaterialHDRP.SetMatrix(HShaderParams._DebugCameraFrustum, debugCameraFrustum);
                         // cmd.Blit(null, VoxelizationShared.VoxelVisualizationRayDirections.rt, VoxelizationShared.VoxelVisualizationMaterialHDRP, 0);
                         CoreUtils.DrawFullScreen(cmd, VoxelizationShared.VoxelVisualizationMaterialHDRP, VoxelizationShared.VoxelVisualizationRayDirections.rt, shaderPassId: 0);
@@ -375,7 +380,10 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
                         cmd.SetComputeTextureParam(VoxelizationShared.VoxelVisualization, (int)VoxelizationShared.VoxelVisualizationKernel.VisualizeVoxels, HShaderParams._Visualization_Output, VoxelizationShared.DebugOutput.rt);
                         cmd.SetComputeIntParam(VoxelizationShared.VoxelVisualization, HShaderParams._MultibounceMode, (int)HSettings.GeneralSettings.Multibounce);
                         cmd.DispatchCompute(VoxelizationShared.VoxelVisualization, (int)VoxelizationShared.VoxelVisualizationKernel.VisualizeVoxels, fullResX_8, fullResY_8, 1);
-                     
+                     	Debug.Log("VisualizeVoxels  DispatchCompute"+fullResX_8+"  "+fullResY_8);
+
+          
+
                         if (HSettings.GeneralSettings.DebugModeWS != DebugModeWS.None)
                             cmd.SetGlobalTexture(HShaderParams.g_HTraceBufferGI, VoxelizationShared.DebugOutput.rt);
                     }
@@ -385,7 +393,6 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
             public void Cleanup()
             {
                 _initialized = false;
-
                 //constant
                 VoxelizationShared.DummyVoxelizationTarget.HRelease();
                 VoxelizationShared.VoxelData.HRelease();

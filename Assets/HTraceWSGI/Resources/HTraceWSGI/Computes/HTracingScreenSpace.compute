@@ -185,11 +185,15 @@ void ScreenSpaceTracing(uint3 pixCoord : SV_DispatchThreadID, uint groupIndex : 
             if ((any(HitPositionNDC.xy > 0.99) || any(HitPositionNDC.xy < 0.01)) && HitDistanceWS < _VoxelSize.x)
                 IsOutsideFrame = true;
         
+        
             _HitRadiance_Output[H_COORD(pixCoord.xy)] = float4(HitRadiance, 1);
+            // _HitRadiance_Output[H_COORD(pixCoord.xy)] = float4(HitPositionNDC, 1);
             _HitDistance_Output[H_COORD(pixCoord.xy)] = PackHitDistance(max(HitDistanceWS, 0.001f), IsOutsideFrame, !HitIsValid);
   
            // _HitRadiance_Output [H_COORD(pixCoord.xy)] = float4(HitRadiance.xyz, 1);
         }
+
+
 }
 
 

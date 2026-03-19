@@ -160,7 +160,7 @@ namespace UnityEngine.Experimental.Rendering.Universal
                         Matrix4x4 viewMatrix = cameraData.GetViewMatrix();
                         Vector4 cameraTranslation = viewMatrix.GetColumn(3);
                         viewMatrix.SetColumn(3, cameraTranslation + m_CameraSettings.offset);
-
+            
                         RenderingUtils.SetViewAndProjectionMatrices(cmd, viewMatrix, projectionMatrix, false);
                     }
                 }

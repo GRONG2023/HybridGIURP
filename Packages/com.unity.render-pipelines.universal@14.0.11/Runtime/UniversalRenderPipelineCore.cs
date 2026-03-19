@@ -228,26 +228,26 @@ namespace UnityEngine.Rendering.Universal
         // Helper function to populate builtin stereo matricies as well as URP stereo matricies
         internal void PushBuiltinShaderConstantsXR(CommandBuffer cmd, bool renderIntoTexture)
         {
-#if ENABLE_VR && ENABLE_XR_MODULE
-            if (xr.enabled)
-            {
-                cmd.SetViewProjectionMatrices(GetViewMatrix(), GetProjectionMatrix());
-                if (xr.singlePassEnabled)
-                {
-                    for (int viewId = 0; viewId < xr.viewCount; viewId++)
-                    {
-                        XRBuiltinShaderConstants.UpdateBuiltinShaderConstants(GetViewMatrix(viewId), GetProjectionMatrix(viewId), renderIntoTexture, viewId);
-                    }
-                    XRBuiltinShaderConstants.SetBuiltinShaderConstants(cmd);
-                }
-                else
-                {
-                    // Update multipass worldSpace camera pos
-                    Vector3 worldSpaceCameraPos = Matrix4x4.Inverse(GetViewMatrix(0)).GetColumn(3);
-                    cmd.SetGlobalVector(ShaderPropertyId.worldSpaceCameraPos, worldSpaceCameraPos);
-                }
-            }
-#endif
+// #if ENABLE_VR && ENABLE_XR_MODULE
+//             if (xr.enabled)
+//             {
+//                 cmd.SetViewProjectionMatrices(GetViewMatrix(), GetProjectionMatrix());
+//                 if (xr.singlePassEnabled)
+//                 {
+//                     for (int viewId = 0; viewId < xr.viewCount; viewId++)
+//                     {
+//                         XRBuiltinShaderConstants.UpdateBuiltinShaderConstants(GetViewMatrix(viewId), GetProjectionMatrix(viewId), renderIntoTexture, viewId);
+//                     }
+//                     XRBuiltinShaderConstants.SetBuiltinShaderConstants(cmd);
+//                 }
+//                 else
+//                 {
+//                     // Update multipass worldSpace camera pos
+//                     Vector3 worldSpaceCameraPos = Matrix4x4.Inverse(GetViewMatrix(0)).GetColumn(3);
+//                     cmd.SetGlobalVector(ShaderPropertyId.worldSpaceCameraPos, worldSpaceCameraPos);
+//                 }
+//             }
+// #endif
         }
 
         /// <summary>
@@ -257,10 +257,10 @@ namespace UnityEngine.Rendering.Universal
         /// <returns> The camera view matrix. </returns>
         public Matrix4x4 GetViewMatrix(int viewIndex = 0)
         {
-#if ENABLE_VR && ENABLE_XR_MODULE
-            if (xr.enabled)
-                return xr.GetViewMatrix(viewIndex);
-#endif
+// #if ENABLE_VR && ENABLE_XR_MODULE
+//             if (xr.enabled)
+//                 return xr.GetViewMatrix(viewIndex);
+// #endif
             return m_ViewMatrix;
         }
 

@@ -93,8 +93,10 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
 
                 SoftwareTracingShared.SpatialOffsetsPacked.HRelease();
                 SoftwareTracingShared.SpatialWeightsPacked.HRelease();
+                SoftwareTracingShared.SpatialWeightsPackedDebug.HRelease();
 
                 SoftwareTracingShared.ReservoirAtlas.HRelease();
+                SoftwareTracingShared.ReservoirAtlas_Debug.HRelease();
                 SoftwareTracingShared.ReservoirAtlas_History.HRelease();
                 SoftwareTracingShared.ReservoirAtlasRadianceData_A.HRelease();
                 SoftwareTracingShared.ReservoirAtlasRadianceData_B.HRelease();
@@ -222,9 +224,11 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
             // -------------------------------------- SPATIAL PREPASS RT -------------------------------------- //
             SoftwareTracingShared.SpatialOffsetsPacked.HTextureAlloc("_SpatialOffsetsPacked", ProbeRes, GraphicsFormat.R32G32B32A32_UInt, 4, textureDimension: TextureDimension.Tex2DArray);
             SoftwareTracingShared.SpatialWeightsPacked.HTextureAlloc("_SpatialWeightsPacked", ProbeRes, GraphicsFormat.R16G16B16A16_UInt, 4, textureDimension: TextureDimension.Tex2DArray);
+            SoftwareTracingShared.SpatialWeightsPackedDebug.HTextureAlloc("_SpatialWeightsPackedDebug", ProbeRes, GraphicsFormat.R16G16B16A16_SFloat);
 
             // -------------------------------------- RESERVOIR RT -------------------------------------- //
             SoftwareTracingShared.ReservoirAtlas.HTextureAlloc("_ReservoirAtlas", ProbeAtlasRes, GraphicsFormat.R32G32B32A32_UInt);
+            SoftwareTracingShared.ReservoirAtlas_Debug.HTextureAlloc("_ReservoirAtlas_Debug", ProbeAtlasRes, GraphicsFormat.R32G32B32A32_SFloat);
             SoftwareTracingShared.ReservoirAtlas_History.HTextureAlloc("_ReservoirAtlas_History", ProbeAtlasRes, GraphicsFormat.R32G32B32A32_UInt, HConstants.PERSISTENT_HISTORY_SAMPLES, textureDimension: TextureDimension.Tex2DArray);
             SoftwareTracingShared.ReservoirAtlasRadianceData_A.HTextureAlloc("_ReservoirAtlasRadianceData_A", ProbeAtlasRes, GraphicsFormat.R32G32_UInt);
             SoftwareTracingShared.ReservoirAtlasRadianceData_B.HTextureAlloc("_ReservoirAtlasRadianceData_B", ProbeAtlasRes, GraphicsFormat.R32G32_UInt);
@@ -426,29 +430,29 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
                 // 对应HDRP的ctx.hdCamera.GetPreviousFrameRT(HDCameraFrameHistoryType.ColorBufferMipChain)
                 // RenderTexture previousColorBuffer = SoftwareTracingShared.ColorPreviousFrame.rt;
 
-			Matrix4x4 currentViewMatrix = camera.worldToCameraMatrix;
-            // Debug.Log("currentViewMatrix = "+currentViewMatrix);
-			currentViewMatrix.SetColumn(3, new Vector4(0, 0, 0, 1));
-            // Debug.Log("currentViewMatrix2 = "+currentViewMatrix);
-			Matrix4x4 currentProjMatrix = GL.GetGPUProjectionMatrix(camera.projectionMatrix, true); // Had to change this from 'false'
-			Matrix4x4 currentViewProjMatrix = currentProjMatrix * currentViewMatrix;
+			// Matrix4x4 currentViewMatrix = camera.worldToCameraMatrix;
+            // // Debug.Log("currentViewMatrix = "+currentViewMatrix);
+			// currentViewMatrix.SetColumn(3, new Vector4(0, 0, 0, 1));
+            // // Debug.Log("currentViewMatrix2 = "+currentViewMatrix);
+			// Matrix4x4 currentProjMatrix = GL.GetGPUProjectionMatrix(camera.projectionMatrix, true); // Had to change this from 'false'
+			// Matrix4x4 currentViewProjMatrix = currentProjMatrix * currentViewMatrix;
 
-			if (isFirstFrame)
-			{
-				// 首帧：使用当前矩阵初始化
-				prevViewProjMatrix = currentViewProjMatrix;
-				prevInvViewProjMatrix = currentViewProjMatrix.inverse;
-				isFirstFrame = false;
-			}
-			else
-			{
-				// 后续帧：使用前一帧的VP矩阵计算逆矩阵
-				prevInvViewProjMatrix = prevViewProjMatrix.inverse;
-			}
+			// if (isFirstFrame)
+			// {
+			// 	// 首帧：使用当前矩阵初始化
+			// 	prevViewProjMatrix = currentViewProjMatrix;
+			// 	prevInvViewProjMatrix = currentViewProjMatrix.inverse;
+			// 	isFirstFrame = false;
+			// }
+			// else
+			// {
+			// 	// 后续帧：使用前一帧的VP矩阵计算逆矩阵
+			// 	prevInvViewProjMatrix = prevViewProjMatrix.inverse;
+			// }
 			
 
-			// 设置全局矩阵供着色器使用
- 			cmd.SetGlobalMatrix(HShaderParams._PrevInvViewProjMatrix, prevInvViewProjMatrix);
+			// // 设置全局矩阵供着色器使用
+ 			// cmd.SetGlobalMatrix(HShaderParams._PrevInvViewProjMatrix, prevInvViewProjMatrix);
 
                 RTHandle currentFrame = cameraColorBuffer;
                 RTHandle previousFrame = SoftwareTracingShared.ColorPreviousFrame.rt;

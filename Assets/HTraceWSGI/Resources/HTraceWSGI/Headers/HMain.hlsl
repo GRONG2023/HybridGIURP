@@ -33,18 +33,26 @@
 #include "HMath.hlsl"
 #include "HPacking.hlsl"
 
-float4x4 _PrevInvViewProjMatrix;
+float4x4 _PrevInvViewProjMatrix2;
+float4x4 _InvViewProjMatrix2;
+float4x4 _ViewMatrix2;
+float4x4 _InvViewMatrix2;
+float4x4 _ViewProjMatrix2;
 
-#define UNITY_MATRIX_PREV_I_VP _PrevInvViewProjMatrix
+#define UNITY_MATRIX_PREV_I_VP2 _PrevInvViewProjMatrix2
+#define UNITY_MATRIX_I_VP2 _InvViewProjMatrix2
+#define UNITY_MATRIX_V2 _ViewMatrix2
+#define UNITY_MATRIX_VP2 _ViewProjMatrix2
+#define UNITY_MATRIX_I_V2 _InvViewMatrix2
 
 // --------------------------------- INCLUDE FILES BELOW ALSO!!!!!!!!!! ----------------------------- //
 
 // ---------------------------------- MATRICES ----------------------------- //
-#define H_MATRIX_PREV_I_VP                  UNITY_MATRIX_PREV_I_VP
-#define H_MATRIX_I_VP                       UNITY_MATRIX_I_VP
-#define H_MATRIX_VP                         UNITY_MATRIX_VP
-#define H_MATRIX_V                          UNITY_MATRIX_V
-#define H_MATRIX_I_V                        UNITY_MATRIX_I_V
+#define H_MATRIX_PREV_I_VP                  UNITY_MATRIX_PREV_I_VP2
+#define H_MATRIX_I_VP                       UNITY_MATRIX_I_VP2
+#define H_MATRIX_VP                         UNITY_MATRIX_VP2
+#define H_MATRIX_V                          UNITY_MATRIX_V2
+#define H_MATRIX_I_V                        UNITY_MATRIX_I_V2
 
 
 

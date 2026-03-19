@@ -5,6 +5,35 @@
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Debug/DebuggingCommon.hlsl"
 #define SHADEROPTIONS_CAMERA_RELATIVE_RENDERING 1
 
+float4x4 InverseFloat4x4(float4x4 m)
+{
+    // 取旋转部分
+    float3x3 R = float3x3(
+        m[0].xyz,
+        m[1].xyz,
+        m[2].xyz
+    );
+    
+    // 旋转部分的转置就是它的逆（正交矩阵）
+    float3x3 Rt = transpose(R);
+
+    // 平移部分
+    float3 t = m[3].xyz; // 注意索引取法需看行列约定
+    // 但 Unity 的矩阵是列主序，平移在 _m03/_m13/_m23
+    t = float3(m[0].w, m[1].w, m[2].w);
+
+    // 新平移 = -Rt * t
+    float3 tInv = mul(-Rt, t);
+
+    float4x4 inv;
+    inv[0] = float4(Rt[0], tInv.x);
+    inv[1] = float4(Rt[1], tInv.y);
+    inv[2] = float4(Rt[2], tInv.z);
+    inv[3] = float4(0,0,0,1);
+
+    return inv;
+}
+
 VertexPositionInputs GetVertexPositionInputs(float3 positionOS)
 {
     #if (SHADEROPTIONS_CAMERA_RELATIVE_RENDERING != 0)
@@ -13,6 +42,25 @@ VertexPositionInputs GetVertexPositionInputs(float3 positionOS)
     input.positionWS -= _WorldSpaceCameraPos.xyz;
     input.positionVS = TransformWorldToView(input.positionWS);
     input.positionCS = TransformWorldToHClip(input.positionWS);
+    // VertexPositionInputs input;
+    // float3 worldPosOffset = -_WorldSpaceCameraPos;
+    // float4x4 worldM = UNITY_MATRIX_M;
+    // worldM[0].w += worldPosOffset.x;
+    // worldM[1].w += worldPosOffset.y;
+    // worldM[2].w += worldPosOffset.z;
+    // float4 tempP = mul(worldM, float4(positionOS, 1.0));
+    // input.positionWS = tempP.xyz;
+    
+    // float4x4 viewModelM = UNITY_MATRIX_I_V;
+    // viewModelM[0].w += worldPosOffset.x;
+    // viewModelM[1].w += worldPosOffset.y;
+    // viewModelM[2].w += worldPosOffset.z;
+    // float4x4 newViewM = InverseFloat4x4(viewModelM);
+
+    // float4x4 newvpM = mul(UNITY_MATRIX_P, newViewM);
+    
+    // input.positionVS = mul((float3x3)newViewM, input.positionWS);
+    // input.positionCS = mul(newvpM, float4(input.positionWS, 1.0));
     #else
     VertexPositionInputs input;
     input.positionWS = TransformObjectToWorld(positionOS);

@@ -216,6 +216,7 @@ void LightEvaluation(uint3 pixCoord : SV_DispatchThreadID, uint groupIndex : SV_
                 _HashBuffer_Counter[HashLowestRankIndex] = 255;
                 _HashBuffer_Key[HashLowestRankIndex] = HashKey | 0x2; 
             }  
+
         }
         #else
         if (MULTIBOUNCE_APV)
@@ -223,7 +224,6 @@ void LightEvaluation(uint3 pixCoord : SV_DispatchThreadID, uint groupIndex : SV_
         }
         #endif
     }
-    
     // Write evaluated hit radiance
     _HitRadiance_Output[H_COORD(pixCoord.xy)] = float4(Payload.HitColor.xyz, 1);
 }

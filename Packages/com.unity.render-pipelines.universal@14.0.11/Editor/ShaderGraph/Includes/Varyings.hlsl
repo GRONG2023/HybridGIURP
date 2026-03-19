@@ -35,6 +35,8 @@ VertexDescription BuildVertexDescription(Attributes input)
 #endif
 #endif
 
+#define SHADEROPTIONS_CAMERA_RELATIVE_RENDERING 1
+
 Varyings BuildVaryings(Attributes input)
 {
     Varyings output = (Varyings)0;
@@ -133,7 +135,18 @@ Varyings BuildVaryings(Attributes input)
 #elif (SHADERPASS == SHADERPASS_META)
     output.positionCS = UnityMetaVertexPosition(input.positionOS, input.uv1, input.uv2, unity_LightmapST, unity_DynamicLightmapST);
 #else
+    // #if (SHADEROPTIONS_CAMERA_RELATIVE_RENDERING != 0)
+    //     float4x4 viewModelM = UNITY_MATRIX_I_V;
+    //     viewModelM[0].w -= _WorldSpaceCameraPos.x;
+    //     viewModelM[1].w -= _WorldSpaceCameraPos.y;
+    //     viewModelM[2].w -= _WorldSpaceCameraPos.z;
+    //     float4x4 newViewM = InverseFloat4x4(viewModelM);
+
+    //     float4x4 newvpM = mul(UNITY_MATRIX_P, newViewM);
+    //     output.positionCS = mul(newvpM, float4(positionWS, 1.0));
+    // #else
     output.positionCS = TransformWorldToHClip(positionWS);
+    // #endif
 #endif
 
 #if defined(VARYINGS_NEED_TEXCOORD0) || defined(VARYINGS_DS_NEED_TEXCOORD0)

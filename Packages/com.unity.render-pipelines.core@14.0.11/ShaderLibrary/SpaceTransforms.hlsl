@@ -50,6 +50,8 @@ float4x4 GetViewToHClipMatrix()
     return UNITY_MATRIX_P;
 }
 
+#define SHADEROPTIONS_CAMERA_RELATIVE_RENDERING 1
+
 // This function always return the absolute position in WS
 float3 GetAbsolutePositionWS(float3 positionRWS)
 {

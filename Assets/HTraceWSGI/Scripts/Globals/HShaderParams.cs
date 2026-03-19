@@ -23,7 +23,20 @@ namespace HTraceWSGI.Scripts.Globals
 		public static readonly int g_CameraDepthTexture          = Shader.PropertyToID("_CameraDepthTexture");
 		public static readonly int g_CameraNormalsTexture        = Shader.PropertyToID("_CameraNormalsTexture");
 		
-		public static int _PrevInvViewProjMatrix           = Shader.PropertyToID("_PrevInvViewProjMatrix");
+		public static int _PrevInvViewProjMatrix2           = Shader.PropertyToID("_PrevInvViewProjMatrix2");
+		public static int _InvViewProjMatrix2           = Shader.PropertyToID("_InvViewProjMatrix2");
+		public static int _NonJitteredViewProjMatrix           = Shader.PropertyToID("_NonJitteredViewProjMatrix");
+		public static int _PrevViewProjMatrix           = Shader.PropertyToID("_PrevViewProjMatrix");
+		public static int _NonJitteredViewProjMatrix2           = Shader.PropertyToID("_NonJitteredViewProjMatrix2");
+		public static int _PrevViewProjMatrix2           = Shader.PropertyToID("_PrevViewProjMatrix2");
+		public static int _ViewMatrix2           = Shader.PropertyToID("_ViewMatrix2");
+		public static int _ViewProjMatrix2           = Shader.PropertyToID("_ViewProjMatrix2");
+		public static int _InvViewMatrix2           = Shader.PropertyToID("_InvViewMatrix2");
+
+		public static int unity_MatrixV2           = Shader.PropertyToID("unity_MatrixV2");
+		public static int unity_MatrixInvV2           = Shader.PropertyToID("unity_MatrixInvV2");
+		public static int unity_MatrixVP2           = Shader.PropertyToID("unity_MatrixVP2");
+		public static int unity_MatrixInvVP2           = Shader.PropertyToID("unity_MatrixInvVP2");
 
 		public static readonly int g_VoxelPositionPyramid      = Shader.PropertyToID("_VoxelPositionPyramid");
 		public static readonly int g_ProbeSize                 = Shader.PropertyToID("_ProbeSize");
@@ -62,7 +75,8 @@ namespace HTraceWSGI.Scripts.Globals
 		public static readonly int _GBuffer2                     = Shader.PropertyToID("_GBuffer2");
 		public static readonly int _GBuffer3                     = Shader.PropertyToID("_GBuffer3");
 		//public static readonly int _CameraRenderingLayersTexture = Shader.PropertyToID("_CameraRenderingLayersTexture");
-		//public static readonly int _GBufferTexture0              = Shader.PropertyToID("_GBufferTexture0");
+		public static readonly int _GBufferTexture0              = Shader.PropertyToID("_GBufferTexture0");
+		public static readonly int _GBufferTexture3              = Shader.PropertyToID("_GBufferTexture3");
 		public static readonly int _CameraGBufferTexture0        = Shader.PropertyToID("_CameraGBufferTexture0");
 
 		public static readonly int H_SHAr = Shader.PropertyToID("H_SHAr");
@@ -169,6 +183,7 @@ namespace HTraceWSGI.Scripts.Globals
 		public static readonly int _ProbeNormalDepth_History             = Shader.PropertyToID("_ProbeNormalDepth_History");
 		public static readonly int _SpatialOffsets_Output                = Shader.PropertyToID("_SpatialOffsets_Output");
 		public static readonly int _SpatialWeights_Output                = Shader.PropertyToID("_SpatialWeights_Output");
+		public static readonly int _SpatialWeights_Output_Debug                = Shader.PropertyToID("_SpatialWeights_Output_Debug");
 		public static readonly int _SpatialOffsetsBuffer                 = Shader.PropertyToID("_SpatialOffsetsBuffer");
 		public static readonly int _SpatialWeightsPacked                 = Shader.PropertyToID("_SpatialWeightsPacked");
 		public static readonly int _SpatialOffsetsPacked                 = Shader.PropertyToID("_SpatialOffsetsPacked");
@@ -180,6 +195,7 @@ namespace HTraceWSGI.Scripts.Globals
 		public static readonly int _RayDistance                        = Shader.PropertyToID("_RayDistance");
 		public static readonly int _ProbeDiffuse                       = Shader.PropertyToID("_ProbeDiffuse");
 		public static readonly int _ReservoirAtlas_Output              = Shader.PropertyToID("_ReservoirAtlas_Output");
+		public static readonly int _ReservoirAtlas_Output_Debug              = Shader.PropertyToID("_ReservoirAtlas_Output_Debug");
 		public static readonly int _ReservoirAtlas_History             = Shader.PropertyToID("_ReservoirAtlas_History");
 		public static readonly int _ReservoirAtlasRayData_Output       = Shader.PropertyToID("_ReservoirAtlasRayData_Output");
 		public static readonly int _ReservoirAtlasRadianceData_Output  = Shader.PropertyToID("_ReservoirAtlasRadianceData_Output");
