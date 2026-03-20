@@ -15,6 +15,8 @@ public class HybridGIFeature : ScriptableRendererFeature
     private ColorHistoryPass _colorHistoryPass;
     private FinalPassHDRP _finalDebugPass;
 
+    public bool  useColorPreviousFrame = false;
+
     /// <inheritdoc/>
     public override void Create()
     {
@@ -42,6 +44,8 @@ public class HybridGIFeature : ScriptableRendererFeature
     // This method is called when setting up the renderer once per-camera.
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
+        _softwareTracingPass.useColorPreviousFrame = useColorPreviousFrame;
+
         renderer.EnqueuePass(_prePass);
         renderer.EnqueuePass(_gBufferPass);
         renderer.EnqueuePass(_motionVectorsPass);

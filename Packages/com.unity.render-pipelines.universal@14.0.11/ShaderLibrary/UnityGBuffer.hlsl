@@ -195,6 +195,60 @@ SurfaceData SurfaceDataFromGbuffer(half4 gbuffer0, half4 gbuffer1, half4 gbuffer
     return surfaceData;
 }
 
+FragmentOutput BRDFDataToGbuffer2(BRDFData brdfData, InputData inputData, half smoothness, half3 Emission, half metallic, half occlusion = 1.0){
+
+    half3 packedNormalWS = PackNormal(inputData.normalWS);
+
+    uint materialFlags = 0;
+
+    #ifdef _RECEIVE_SHADOWS_OFF
+    materialFlags |= kMaterialFlagReceiveShadowsOff;
+    #endif
+
+    half3 packedSpecular;
+
+    #ifdef _SPECULAR_SETUP
+    materialFlags |= kMaterialFlagSpecularSetup;
+    packedSpecular = brdfData.specular.rgb;
+    #else
+    packedSpecular.r = brdfData.reflectivity;
+    packedSpecular.gb = 0.0;
+    #endif
+
+    #ifdef _SPECULARHIGHLIGHTS_OFF
+    // During the next deferred shading pass, we don't use a shader variant to disable specular calculations.
+    // Instead, we can either silence specular contribution when writing the gbuffer, and/or reserve a bit in the gbuffer
+    // and use this during shading to skip computations via dynamic branching. Fastest option depends on platforms.
+    materialFlags |= kMaterialFlagSpecularHighlightsOff;
+    packedSpecular = 0.0.xxx;
+    #endif
+
+    #if defined(LIGHTMAP_ON) && defined(_MIXED_LIGHTING_SUBTRACTIVE)
+    materialFlags |= kMaterialFlagSubtractiveMixedLighting;
+    #endif
+
+    FragmentOutput output;
+    // output.GBuffer0 = half4(brdfData.albedo.rgb, PackMaterialFlags(materialFlags));  // diffuse           diffuse         diffuse         materialFlags   (sRGB rendertarget)
+    output.GBuffer0 = half4(brdfData.albedo.rgb, metallic);  // diffuse           diffuse         diffuse         materialFlags   (sRGB rendertarget)
+    output.GBuffer1 = half4(Emission, occlusion);                              // metallic/specular specular        specular        occlusion
+    output.GBuffer2 = half4(packedNormalWS, smoothness);                             // encoded-normal    encoded-normal  encoded-normal  smoothness
+    
+    output.GBuffer3 = half4(Emission, 1);                                  // GI                GI              GI              unused          (lighting buffer)
+    // output.GBuffer3 = half4(0,0,0, 1);                                  // GI                GI              GI              unused          (lighting buffer)
+    #if _RENDER_PASS_ENABLED
+    output.GBuffer4 = inputData.positionCS.z;
+    #endif
+    #if OUTPUT_SHADOWMASK
+    output.GBUFFER_SHADOWMASK = inputData.shadowMask; // will have unity_ProbesOcclusion value if subtractive lighting is used (baked)
+    #endif
+    #ifdef _WRITE_RENDERING_LAYERS
+    uint renderingLayers = GetMeshRenderingLayer();
+    output.GBUFFER_LIGHT_LAYERS = float4(EncodeMeshRenderingLayer(renderingLayers), 0.0, 0.0, 0.0);
+    #endif
+
+    return output;
+}
+
 // This will encode SurfaceData into GBuffer
 FragmentOutput BRDFDataToGbuffer(BRDFData brdfData, InputData inputData, half smoothness, half3 globalIllumination, half occlusion = 1.0)
 {
@@ -229,6 +283,7 @@ FragmentOutput BRDFDataToGbuffer(BRDFData brdfData, InputData inputData, half sm
     #endif
 
     FragmentOutput output;
+    // output.GBuffer0 = half4(brdfData.albedo.rgb, PackMaterialFlags(materialFlags));  // diffuse           diffuse         diffuse         materialFlags   (sRGB rendertarget)
     output.GBuffer0 = half4(brdfData.albedo.rgb, PackMaterialFlags(materialFlags));  // diffuse           diffuse         diffuse         materialFlags   (sRGB rendertarget)
     output.GBuffer1 = half4(packedSpecular, occlusion);                              // metallic/specular specular        specular        occlusion
     output.GBuffer2 = half4(packedNormalWS, smoothness);                             // encoded-normal    encoded-normal  encoded-normal  smoothness

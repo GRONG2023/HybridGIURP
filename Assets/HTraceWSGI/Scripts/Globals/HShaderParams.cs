@@ -56,6 +56,7 @@ namespace HTraceWSGI.Scripts.Globals
         public static readonly int _RankingTileXSPP = Shader.PropertyToID("_RankingTileXSPP");
         public static readonly int _ScramblingTexture = Shader.PropertyToID("_ScramblingTexture");
         public static readonly int _OwenScrambledTexture = Shader.PropertyToID("_OwenScrambledTexture");
+        public static readonly int _PreIntegratedFGD_GGXDisneyDiffuse = Shader.PropertyToID("_PreIntegratedFGD_GGXDisneyDiffuse");
         public static readonly int unity_SpecCube2 = Shader.PropertyToID("unity_SpecCube2");
         public static readonly int unity_SpecCube0 = Shader.PropertyToID("unity_SpecCube0");
 

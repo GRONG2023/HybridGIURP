@@ -124,10 +124,11 @@ void GeometryNormalsSmoothing(uint3 pixCoord : SV_DispatchThreadID, uint2 groupT
     float3 WorldPosCenter = H_COMPUTE_POSITION_WS((pixCoord.xy * float(_ProbeSize) + float2(ProbeOffset) + 0.5f) * _ScreenSize.zw, NormalDepthCenter.w, H_MATRIX_I_VP);
     
     float3 NormalGathered = NormalDepthCenter.xyz;
-    
-    for (int x = -4; x <= 4; x++)
+
+    // Optimized: Reduced sample range from 9x10 (90 samples) to 7x7 (49 samples) - 45% reduction
+    for (int x = -3; x <= 3; x++)
     {
-        for (int y = -5; y <= 4; y++)
+        for (int y = -3; y <= 3; y++)
         {
             if (x == 0 && y == 0)
                 continue;

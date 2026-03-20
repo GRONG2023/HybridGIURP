@@ -26,6 +26,7 @@
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RaytracingSampling.hlsl"
 
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariables.hlsl"
 
 
 
@@ -276,33 +277,6 @@ float3 GeometricalNormalFromDepth(float2 pixCoord)
 TEXTURE2D(_ExposureTexture);
 TEXTURE2D(_PrevExposureTexture);
 
-float GetCurrentExposureMultiplier()
-{
-    return 0.00651;
-    //return LOAD_TEXTURE2D(_ExposureTexture, int2(0, 0)).x;
-}
-
-float GetInverseCurrentExposureMultiplier()
-{
-    float exposure = GetCurrentExposureMultiplier();
-    return rcp(exposure + (exposure == 0.0)); // zero-div guard
-}
-
-
-float GetPreviousExposureMultiplier()
-{
-    return 0.00651;
-    //return LOAD_TEXTURE2D(_PrevExposureTexture, int2(0, 0)).x;
-    // _ProbeExposureScale is a scale used to perform range compression to avoid saturation of the content of the probes. It is 1.0 if we are not rendering probes.
-    //return LOAD_TEXTURE2D(_PrevExposureTexture, int2(0, 0)).x * _ProbeExposureScale;
-
-}
-
-float GetInversePreviousExposureMultiplier()
-{
-    float exposure = GetPreviousExposureMultiplier();
-    return rcp(exposure + (exposure == 0.0)); // zero-div guard
-}
 
 // ---------------------------------- OTHER -----------------------------------------
 #define HGetInversePreviousExposureMultiplier GetInversePreviousExposureMultiplier()

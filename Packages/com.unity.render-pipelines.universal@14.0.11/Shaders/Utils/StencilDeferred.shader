@@ -465,7 +465,7 @@ Shader "Hidden/Universal Render Pipeline/StencilDeferred"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Utils/Deferred.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
-
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariables.hlsl"
                     
             struct Attributes
             {
@@ -526,6 +526,8 @@ Shader "Hidden/Universal Render Pipeline/StencilDeferred"
             
             
             TEXTURE2D(_HTraceBufferGI);
+            TEXTURE2D(_GBuffer0);
+            TEXTURE2D(_GBuffer1);
 
             half4 FragSSAOOnly(Varyings input) : SV_Target
             {
@@ -534,8 +536,28 @@ Shader "Hidden/Universal Render Pipeline/StencilDeferred"
                  float2 screen_uv = (input.screenUV.xy / input.screenUV.z);
             
 
-                 half3 diffuseLighting = SAMPLE_TEXTURE2D(_HTraceBufferGI, sampler_LinearClamp, screen_uv);
-                return half4(diffuseLighting,1.0);
+                 half4 GBuffer0 = SAMPLE_TEXTURE2D(_GBuffer0, sampler_LinearClamp, screen_uv);
+                 half4 emission = SAMPLE_TEXTURE2D(_GBuffer1, sampler_LinearClamp, screen_uv);
+                 emission.rgb *= 1000.0;
+                 half3 baseColor = GBuffer0.rgb;
+                 float metallic = GBuffer0.a;
+                 half3 diffuseColor = baseColor * (1.0 - metallic);
+
+                 float IndirectDiffuseMultiplier = 1.5;
+
+                 half3 inDirectDiffuseLighting = SAMPLE_TEXTURE2D(_HTraceBufferGI, sampler_LinearClamp, screen_uv);
+                inDirectDiffuseLighting *= GetInverseCurrentExposureMultiplier();
+                inDirectDiffuseLighting *= diffuseColor;
+                inDirectDiffuseLighting *= IndirectDiffuseMultiplier;
+                inDirectDiffuseLighting += emission.rgb;
+                inDirectDiffuseLighting *= GetCurrentExposureMultiplier();
+
+                 half3 dielectricF0 = half3(0.04,0.04,0.04);
+                 float fresnel0 = lerp(dielectricF0.xxx, baseColor, metallic);
+
+                 half3 finalColor = inDirectDiffuseLighting;
+                // finalColor = diffuseColor;
+                return half4(finalColor,1.0);
             }
             ENDHLSL
         }

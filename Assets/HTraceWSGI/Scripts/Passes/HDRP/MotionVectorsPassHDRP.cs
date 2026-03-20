@@ -71,24 +71,6 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
 
             var cmd = CommandBufferPool.Get(HNames.HTRACE_MV_PASS_NAME);
 
-		    // Matrix4x4 currentViewMatrix = camera.worldToCameraMatrix;
-            // // Debug.Log("currentViewMatrix = "+currentViewMatrix);
-			// currentViewMatrix.SetColumn(3, new Vector4(0, 0, 0, 1));
-            // // Debug.Log("currentViewMatrix2 = "+currentViewMatrix);
-			// Matrix4x4 currentProjMatrix = GL.GetGPUProjectionMatrix(camera.nonJitteredProjectionMatrix, true); // Had to change this from 'false'
-
-            // _NonJitteredViewProjMatrix = currentProjMatrix * currentViewMatrix;
-            // cmd.SetGlobalMatrix(HShaderParams._NonJitteredViewProjMatrix, _NonJitteredViewProjMatrix);
-
-            // if (isFirst)
-            // {
-            //     _PrevViewProjMatrix = _NonJitteredViewProjMatrix;
-            //     isFirst = false;
-            // }
-            // cmd.SetGlobalMatrix(HShaderParams._PrevViewProjMatrix, _PrevViewProjMatrix);
-            // _PrevViewProjMatrix = _NonJitteredViewProjMatrix;
-
-
             Matrix4x4 currentViewMatrix = camera.worldToCameraMatrix;
             // Debug.Log("currentViewMatrix = "+currentViewMatrix);
 			currentViewMatrix.SetColumn(3, new Vector4(0, 0, 0, 1));
@@ -169,7 +151,7 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
                 
                 
                 CoreUtils.SetRenderTarget(cmd, SoftwareTracingShared.CustomCameraMotionVectors.rt, ClearFlag.Color);
-				CoreUtils.DrawFullScreen(cmd, CameraMotionVectorsMaterial_HDRP, SoftwareTracingShared.CustomCameraMotionVectors.rt, renderer.cameraDepthTargetHandle, shaderPassId: 0);
+				CoreUtils.DrawFullScreen(cmd, CameraMotionVectorsMaterial_HDRP, SoftwareTracingShared.CustomCameraMotionVectors.rt, null, shaderPassId: 0);
 
 
                 cmd.SetGlobalTexture(HShaderParams.g_HTraceMotionVectors, SoftwareTracingShared.CustomCameraMotionVectors.rt);

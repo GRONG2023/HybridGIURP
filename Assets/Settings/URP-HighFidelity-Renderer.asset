@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: HybridGIFeature
   m_EditorClassIdentifier: 
   m_Active: 1
+  useColorPreviousFrame: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
