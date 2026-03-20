@@ -33,11 +33,6 @@ namespace HTraceWSGI.Scripts.Globals
 		public static int _ViewProjMatrix2           = Shader.PropertyToID("_ViewProjMatrix2");
 		public static int _InvViewMatrix2           = Shader.PropertyToID("_InvViewMatrix2");
 
-		public static int unity_MatrixV2           = Shader.PropertyToID("unity_MatrixV2");
-		public static int unity_MatrixInvV2           = Shader.PropertyToID("unity_MatrixInvV2");
-		public static int unity_MatrixVP2           = Shader.PropertyToID("unity_MatrixVP2");
-		public static int unity_MatrixInvVP2           = Shader.PropertyToID("unity_MatrixInvVP2");
-
 		public static readonly int g_VoxelPositionPyramid      = Shader.PropertyToID("_VoxelPositionPyramid");
 		public static readonly int g_ProbeSize                 = Shader.PropertyToID("_ProbeSize");
 		public static readonly int g_OctahedralSize            = Shader.PropertyToID("_OctahedralSize");

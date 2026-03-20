@@ -103,11 +103,11 @@ namespace HTraceWSGI.Scripts
 
         private void OnEnable()
         {
-                    // 开启垂直同步
-            QualitySettings.vSyncCount = 1;  // 0=关闭, 1=每帧同步, 2=每两帧同步
+            //         // 开启垂直同步
+            QualitySettings.vSyncCount = 0;  // 0=关闭, 1=每帧同步, 2=每两帧同步
             
-            // 配合设置目标帧率（可选）
-            Application.targetFrameRate = 60;
+            // // 配合设置目标帧率（可选）
+            Application.targetFrameRate = 1000;
             
             HSettings.GeneralSettings = GeneralSettings;
             HSettings.VoxelizationSettings = VoxelizationSettings;

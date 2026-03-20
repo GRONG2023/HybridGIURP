@@ -20,8 +20,9 @@ H_TEXTURE(_NormalDepthDownsampled);
 
 H_RW_TEXTURE_ARRAY(uint4, _SpatialOffsets_Output);
 H_RW_TEXTURE_ARRAY(uint4, _SpatialWeights_Output);
+#ifdef DEBUG_OUTPUT
 H_RW_TEXTURE(float4, _SpatialWeights_Output_Debug);
-
+#endif
 H_RW_TEXTURE(float, _ProbeSSAO_Output);
 H_RW_TEXTURE(float3, _ProbeDiffuse_Output);
 H_RW_TEXTURE(float4, _GeometryNormal_Output);
@@ -263,16 +264,17 @@ void SpatialPrepass(uint3 pixCoord : SV_DispatchThreadID, uint2 groupThreadID : 
             uint2 ProbeOffset;
             float4 NormalDepthSample = UnpackNormalDepth(asuint(H_LOAD(_ProbeNormalDepth, TapCoord).xy), ProbeOffset); //npackNormalDepth(asuint(H_LOAD(_NormalDepthDownsampled, TapCoord)));
             float3 WorldPosSample = H_COMPUTE_POSITION_WS((TapCoord * float(_ProbeSize) + float2(ProbeOffset) + 0.5f) * _ScreenSize.zw, NormalDepthSample.w, H_MATRIX_I_VP);
-          
+
             float SampleRadius = length(Sample);
-            
+            float SampleDepthLinear = H_LINEAR_EYE_DEPTH(NormalDepthSample.w); // Cache linear depth
+
             // Calculate sample normal & plane weights
             float NormalWeight = saturate(dot(NormalCenter, NormalDepthSample.xyz));
-            float PlaneWeight = ProbePlaneWeighting(NormalPlane, WorldPosSample, H_LINEAR_EYE_DEPTH(NormalDepthSample.w), 1000.0f);
+            float PlaneWeight = ProbePlaneWeighting(NormalPlane, WorldPosSample, SampleDepthLinear, 1000.0f);
             float GaussianWeight = SampleRadius > 0.001f ? GaussianWeighting(SampleRadius, Sigma) : 1.0f;
- 
+
             // If the distance to the sample is acceptable - use more accurate plane estimation
-            if (abs(H_LINEAR_EYE_DEPTH(NormalDepthSample.w) - SamplePosHC.w) < 0.1)
+            if (abs(SampleDepthLinear - SamplePosHC.w) < 0.1)
                 PlaneWeight = PlaneWeighting(WorldPosCenter, WorldPosSample, NormalCenter, NormalDepthSample.xyz, 4);
 
             // Combine all weights
@@ -290,7 +292,9 @@ void SpatialPrepass(uint3 pixCoord : SV_DispatchThreadID, uint2 groupThreadID : 
         _SpatialWeights_Output[uint3(pixCoord.xy, H_INDEX_ARRAY(1 + k))] = PackFilteringWeightsX8(SampleWeightsX8);
         _SpatialOffsets_Output[uint3(pixCoord.xy, H_INDEX_ARRAY(1 + k))] = PackFilteringOffsetsX8(SampleOffsetsX8);
      
+        #ifdef DEBUG_OUTPUT
         _SpatialWeights_Output_Debug[pixCoord.xy] = float4(SampleWeightsX8[0],SampleWeightsX8[1],SampleWeightsX8[2],1);
+        #endif
 
         FilterRadius += RadiusStep;
     }

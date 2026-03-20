@@ -247,7 +247,7 @@ void ProbeAtlasTemporalReuse(uint3 pixCoord : SV_DispatchThreadID, uint2 groupTh
 
     // Output reservoir atlas for history
     _ReservoirAtlas_Output[H_COORD(pixCoord.xy)] = uint4(RadianceDataPacked.xy, RayDataPacked.xy);
-    _ReservoirAtlas_Output_Debug[H_COORD(pixCoord.xy)] = float4(PositionWS,1);
+    // _ReservoirAtlas_Output_Debug[H_COORD(pixCoord.xy)] = float4(PositionWS,1);
 
     // if (all(Merged == 0))
     //     Test = 1; 
@@ -276,7 +276,7 @@ void ProbeAtlasSpatialReuse(uint3 pixCoord : SV_DispatchThreadID, uint2 groupThr
     // Initialize reservoir
     Reservoir Reservoir;
     ReservoirInitialize(pixCoord.xy, Reservoir);
-  _ReservoirAtlas_Output_Debug[H_COORD(pixCoord.xy)] = float4(Reservoir.Radiance.Color,1);
+//   _ReservoirAtlas_Output_Debug[H_COORD(pixCoord.xy)] = float4(Reservoir.Radiance.Color,1);
     // Load and unpack radiance data to reservoir
     uint2 RadianceDataPacked = asuint(H_LOAD(_ReservoirAtlasRadianceData, pixCoord.xy).xy);
     UnpackRadianceData(RadianceDataPacked, Diffuse, Reservoir.Radiance);
@@ -313,7 +313,7 @@ void ProbeAtlasSpatialReuse(uint3 pixCoord : SV_DispatchThreadID, uint2 groupThr
         // Merge with center reservoir
         ReservoirMergeSpatial(CellTapCoord, ReservoirSamplePacked, SampleWeights[i] * ShadowGuidanceWeight, Diffuse, Reservoir, ReservoirUpdateRandom);
     }
-      _ReservoirAtlas_Output_Debug[H_COORD(pixCoord.xy)] = float4(Reservoir.Radiance.Color,1);
+    //   _ReservoirAtlas_Output_Debug[H_COORD(pixCoord.xy)] = float4(Reservoir.Radiance.Color,1);
     //   _ReservoirAtlas_Output_Debug[H_COORD(pixCoord.xy)] = float4(SampleWeights[0],SampleWeights[1],SampleWeights[2],1);
 
     // Recalculate W

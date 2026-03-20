@@ -107,10 +107,6 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
             Matrix4x4 _InvViewMatrix = currentViewMatrix.inverse;
             cmd.SetGlobalMatrix(HShaderParams._InvViewMatrix2, _InvViewMatrix);
 
- 			// cmd.SetGlobalMatrix(HShaderParams.unity_MatrixV2, currentViewMatrix);
- 			cmd.SetGlobalMatrix(HShaderParams.unity_MatrixInvV2, _InvViewMatrix);
- 			// cmd.SetGlobalMatrix(HShaderParams.unity_MatrixVP2, _NonJitteredViewProjMatrix);
-
 
             if (isFirst)
             {
@@ -131,7 +127,6 @@ namespace HTraceWSGI.Scripts.Passes.HDRP
             Matrix4x4 _NonJitteredViewProjMatrixInverse = _NonJitteredViewProjMatrix.inverse;
 			cmd.SetGlobalMatrix(HShaderParams._InvViewProjMatrix2, _NonJitteredViewProjMatrixInverse);
  			cmd.SetGlobalMatrix(HShaderParams._PrevInvViewProjMatrix2, prevInvViewProjMatrix);
- 			cmd.SetGlobalMatrix(HShaderParams.unity_MatrixInvVP2, _NonJitteredViewProjMatrixInverse);
 
 
 			_PrevViewProjMatrix = _NonJitteredViewProjMatrix;
