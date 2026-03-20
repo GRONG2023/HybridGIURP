@@ -153,7 +153,6 @@ namespace UnityEngine.Rendering.Universal
 
             // Set the default view/projection, note: projectionMatrix will be set as a gpu-projection (gfx api adjusted) for rendering.
             cmd.SetViewProjectionMatrices(viewMatrix, projectionMatrix);
-            Debug.Log("SetCameraMatrices---------------------");
                         
             if (setInverseMatrices)
             {
