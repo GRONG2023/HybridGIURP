@@ -913,8 +913,7 @@ namespace HTraceWSGI.Scripts.Passes.Shared
                 cmd.SetComputeTextureParam(HReSTIR, (int)HReSTIRKernel.ProbeAtlasSpatialReuse, HShaderParams._ReservoirAtlasRadianceData_Output, ReservoirAtlasRadianceData_A.rt);
                 cmd.DispatchCompute(HReSTIR, (int)HReSTIRKernel.ProbeAtlasSpatialReuse, probeAtlasResX_8, probeAtlasResY_8, 1);
             }   
-                            
-            // cmd.Blit(ReservoirAtlas_Debug.rt, RadianceAccumulated.rt);
+
             // cmd.Blit(ReservoirAtlas_Debug.rt, RadianceAccumulated.rt);
             // cmd.SetGlobalTexture(HShaderParams.g_HTraceBufferGI, RadianceAccumulated.rt);
             // return;
